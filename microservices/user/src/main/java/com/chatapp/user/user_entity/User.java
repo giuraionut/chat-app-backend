@@ -4,9 +4,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.modelmapper.ModelMapper;
 
 import javax.persistence.*;
-import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -30,18 +30,13 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
-    //    private Instant dateOfBirth;
     private String avatar;
 
-    public User(String username, String password, String email, /*Instant dateOfBirth,*/ String avatar) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        //this.dateOfBirth = dateOfBirth;
-        this.avatar = avatar;
+    public UserDto.Register toRegisterDto() {
+        return new ModelMapper().map(this, UserDto.Register.class);
     }
 
-    public UserDto toDto() {
-        return new UserDto(username, password, email, /*dateOfBirth,*/ avatar);
+    public UserDto.Return toReturnDto() {
+        return new ModelMapper().map(this, UserDto.Return.class);
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 
 @RestController
@@ -14,55 +15,53 @@ import java.io.IOException;
 public record UserController(UserService userService) {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
+    private static final String USER_NOT_FOUND = "User does not exists";
+    private static final String USERNAME_DUPLICATE = "Username already exists";
+
     @PostMapping()
-    public UserDto createUser(@RequestBody UserDto userDto, HttpServletResponse response) throws IOException {
+    public UserDto.Return createUser(@RequestBody UserDto.Register registerUserDto, HttpServletResponse response) throws IOException {
         try {
             response.setStatus(HttpStatus.CREATED.value());
-            return this.userService.add(userDto.toUser()).toDto();
+            return this.userService.add(registerUserDto.toUser()).toReturnDto();
         } catch (Exception ex) {
-            response.sendError(HttpStatus.CONFLICT.value(), "Username already exists");
+            response.sendError(HttpStatus.CONFLICT.value(), USERNAME_DUPLICATE);
             logger.trace("User Controller - createUser", ex);
             return null;
         }
     }
 
     @GetMapping(path = "{username}")
-    public UserDto readUser(HttpServletResponse response, @PathVariable("username") String username) throws IOException {
-        final User user = this.userService.findByUsername(username);
-        if (user != null) {
+    public UserDto.Return readUser(HttpServletResponse response, @PathVariable("username") String username) throws IOException {
+        try {
             response.setStatus(HttpStatus.FOUND.value());
-            return user.toDto();
-        } else {
-            response.sendError(HttpStatus.NOT_FOUND.value(), "User not found");
+            return this.userService.findByUsername(username).toReturnDto();
+        } catch (NoSuchElementException ex) {
+            logger.trace("User Controller - readUser", ex);
+            response.sendError(HttpStatus.NOT_FOUND.value(), USER_NOT_FOUND);
             return null;
         }
     }
 
     @PutMapping(path = "{username}")
-    public UserDto updateUser(HttpServletResponse response, @PathVariable("username") String username, @RequestBody UserDto userDto) throws IOException {
-        final User user = this.userService.findByUsername(username);
-        if (user != null) {
+    public UserDto.Return updateUser(HttpServletResponse response, @PathVariable("username") String username, @RequestBody UserDto.Update updateUserDto) throws IOException {
+        try {
             response.setStatus(HttpStatus.OK.value());
-            final User fromDto = userDto.toUser();
-            fromDto.setId(user.getId());
-            this.userService.add(fromDto);
-            return user.toDto();
-        } else {
-            response.sendError(HttpStatus.NOT_FOUND.value(), "User not found");
+            return this.userService.update(username, updateUserDto).toReturnDto();
+        } catch (NoSuchElementException ex) {
+            logger.trace("User Controller - updateUser", ex);
+            response.sendError(HttpStatus.NOT_FOUND.value(), USER_NOT_FOUND);
             return null;
         }
     }
 
-
     @DeleteMapping(path = "{username}")
     public void deleteUser(HttpServletResponse response, @PathVariable("username") String username) throws IOException {
-        final boolean deleted = this.userService.delete(username);
-        if (deleted) {
+        try {
+            this.userService.delete(username);
             response.setStatus(HttpStatus.OK.value());
-        } else {
-            response.sendError(HttpStatus.NOT_FOUND.value(), "User not found");
+        } catch (NoSuchElementException ex) {
+            logger.trace("User Controller - deleteUser", ex);
+            response.sendError(HttpStatus.NOT_FOUND.value(), USER_NOT_FOUND);
         }
     }
-
-
 }

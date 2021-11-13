@@ -39,38 +39,39 @@ class UserControllerTest {
     @Test
     void createUser() throws Exception {
 
-        UserDto userDto = new UserDto("test",
-                "123",
-                "test@gmail.com",
-                "http://www.avatar.com");
+        UserDto.Register registerUserDto = new UserDto.Register();
+        registerUserDto.setUsername("test");
+        registerUserDto.setPassword("pass123");
+        registerUserDto.setUsername("test@gmail.com");
 
-        Mockito.when(userService.add(userDto.toUser())).thenReturn(userDto.toUser());
+        Mockito.when(userService.add(registerUserDto.toUser())).thenReturn(registerUserDto.toUser());
 
         String url = "/api/v1/user";
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
         ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-        String requestJson = ow.writeValueAsString(userDto);
+        String requestJson = ow.writeValueAsString(registerUserDto);
 
         mvc.perform(MockMvcRequestBuilders.post(url).contentType(MediaType.APPLICATION_JSON).content(requestJson)).andExpect(status().isCreated());
     }
 
     @Test
     void readUser() throws Exception {
-        UserDto userDto = new UserDto("test",
-                "123",
-                "test@gmail.com",
-                "http://www.avatar.com");
-        Mockito.when(userService.findByUsername("test")).thenReturn(userDto.toUser());
+        UserDto.Return returnUserDto = new UserDto.Return();
+
+        returnUserDto.setUsername("test");
+        returnUserDto.setEmail("test@gmail.com");
+        returnUserDto.setAvatar("null");
+
+        Mockito.when(userService.findByUsername("test")).thenReturn(returnUserDto.toUser());
 
         String url = "/api/v1/user/{username}";
 
-        RequestBuilder requestBuilder = MockMvcRequestBuilders.get(url, userDto.getUsername());
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get(url, returnUserDto.getUsername());
         final MvcResult result = mvc.perform(requestBuilder).andExpect(status().isFound()).andReturn();
         assertEquals("{\"username\":\"test\"," +
-                "\"password\":\"123\"," +
-                "\"email\":\"test@gmail.com\"," +
-                "\"avatar\":\"http://www.avatar.com\"" +
+                        "\"email\":\"test@gmail.com\"," +
+                        "\"avatar\":\"null\"" +
                         "}",
                 result.getResponse().getContentAsString());
     }
@@ -78,37 +79,31 @@ class UserControllerTest {
     @Test
     void updateUser() throws Exception {
 
-        UserDto userDto = new UserDto("test",
-                "123",
-                "test@gmail.com",
-                "http://www.avatar.com");
+        UserDto.Update updateUserDto = new UserDto.Update();
+        updateUserDto.setUsername("test123");
+        updateUserDto.setPassword("pass123");
+        updateUserDto.setEmail("test123@gmail.com");
+        updateUserDto.setAvatar("https://test123.avatar.com");
 
-        UserDto newUserDto = new UserDto("test12345",
-                "12345",
-                "test12345@gmail.com",
-                "http://www.avatar12345.com");
-
-        Mockito.when(userService.add(userDto.toUser())).thenReturn(userDto.toUser());
+        Mockito.when(userService.update("test", updateUserDto)).thenReturn(updateUserDto.toUser());
 
         String url = "/api/v1/user/{username}";
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
         ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-        String requestJson = ow.writeValueAsString(newUserDto);
+        String requestJson = ow.writeValueAsString(updateUserDto);
 
-        RequestBuilder requestBuilder = MockMvcRequestBuilders.put(url, userDto.getUsername())
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.put(url, updateUserDto.getUsername())
                 .contentType(MediaType.APPLICATION_JSON).content(requestJson);
         mvc.perform(requestBuilder).andExpect(status().isOk()).andReturn();
     }
 
     @Test
     void deleteUser() throws Exception {
-        Mockito.when(userService.delete("test")).thenReturn(true);
         String url = "/api/v1/user/{username}";
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.delete(url, "test");
         mvc.perform(requestBuilder).andExpect(status().isOk()).andReturn();
     }
-
 }
