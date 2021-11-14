@@ -1,12 +1,8 @@
 package com.chatapp.user.user_entity_test;
 
-import com.chatapp.user.user_entity.UserController;
-import com.chatapp.user.user_entity.UserDto;
-import com.chatapp.user.user_entity.UserRepository;
-import com.chatapp.user.user_entity.UserService;
+import com.chatapp.user.user_entity.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -16,11 +12,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
@@ -28,13 +24,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UserControllerTest {
 
     @Autowired
-    private MockMvc mvc;
+    private MockMvc mockMvc;
 
     @MockBean
     private UserService userService;
 
     @MockBean
     private UserRepository userRepository;
+
+    private final String URL = "/api/v1/user";
+
+    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectWriter writer = mapper.writer();
+
 
     @Test
     void createUser() throws Exception {
@@ -44,15 +46,11 @@ class UserControllerTest {
         registerUserDto.setPassword("pass123");
         registerUserDto.setUsername("test@gmail.com");
 
-        Mockito.when(userService.add(registerUserDto.toUser())).thenReturn(registerUserDto.toUser());
+        Mockito.when(userService.add(any(User.class))).thenReturn(registerUserDto.toUser());
 
-        String url = "/api/v1/user";
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
-        ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-        String requestJson = ow.writeValueAsString(registerUserDto);
+        String json = writer.writeValueAsString(registerUserDto);
 
-        mvc.perform(MockMvcRequestBuilders.post(url).contentType(MediaType.APPLICATION_JSON).content(requestJson)).andExpect(status().isCreated());
+        mockMvc.perform(MockMvcRequestBuilders.post(URL).contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(status().isCreated());
     }
 
     @Test
@@ -63,17 +61,14 @@ class UserControllerTest {
         returnUserDto.setEmail("test@gmail.com");
         returnUserDto.setAvatar("null");
 
-        Mockito.when(userService.findByUsername("test")).thenReturn(returnUserDto.toUser());
+        Mockito.when(userService.findByUsername(any(String.class))).thenReturn(returnUserDto.toUser());
 
-        String url = "/api/v1/user/{username}";
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get(URL + "/{username}", returnUserDto.getUsername());
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isFound())
+                .andExpect(jsonPath("$.username").value(returnUserDto.getUsername()))
+                .andExpect(jsonPath("$.email").value(returnUserDto.getEmail()));
 
-        RequestBuilder requestBuilder = MockMvcRequestBuilders.get(url, returnUserDto.getUsername());
-        final MvcResult result = mvc.perform(requestBuilder).andExpect(status().isFound()).andReturn();
-        assertEquals("{\"username\":\"test\"," +
-                        "\"email\":\"test@gmail.com\"," +
-                        "\"avatar\":\"null\"" +
-                        "}",
-                result.getResponse().getContentAsString());
     }
 
     @Test
@@ -85,25 +80,23 @@ class UserControllerTest {
         updateUserDto.setEmail("test123@gmail.com");
         updateUserDto.setAvatar("https://test123.avatar.com");
 
-        Mockito.when(userService.update("test", updateUserDto)).thenReturn(updateUserDto.toUser());
+        final String json = writer.writeValueAsString(updateUserDto);
+        Mockito.when(this.userService.update(any(String.class), any(UserDto.Update.class)))
+                .thenReturn(updateUserDto.toUser());
 
-        String url = "/api/v1/user/{username}";
+        mockMvc.perform(MockMvcRequestBuilders
+                        .put(URL + "/{username}", "test")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value(updateUserDto.getUsername()));
 
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
-        ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-        String requestJson = ow.writeValueAsString(updateUserDto);
-
-        RequestBuilder requestBuilder = MockMvcRequestBuilders.put(url, updateUserDto.getUsername())
-                .contentType(MediaType.APPLICATION_JSON).content(requestJson);
-        mvc.perform(requestBuilder).andExpect(status().isOk()).andReturn();
     }
 
     @Test
     void deleteUser() throws Exception {
-        String url = "/api/v1/user/{username}";
 
-        RequestBuilder requestBuilder = MockMvcRequestBuilders.delete(url, "test");
-        mvc.perform(requestBuilder).andExpect(status().isOk()).andReturn();
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.delete(URL + "/{username}", "test");
+        mockMvc.perform(requestBuilder).andExpect(status().isOk()).andReturn();
     }
 }

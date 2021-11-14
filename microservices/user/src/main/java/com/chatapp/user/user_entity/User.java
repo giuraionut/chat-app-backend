@@ -36,6 +36,10 @@ public class User {
         return new ModelMapper().map(this, UserDto.Register.class);
     }
 
+    public UserDto.Update toUpdateDto() {
+        return new ModelMapper().map(this, UserDto.Update.class);
+    }
+
     public UserDto.Return toReturnDto() {
         return new ModelMapper().map(this, UserDto.Return.class);
     }
