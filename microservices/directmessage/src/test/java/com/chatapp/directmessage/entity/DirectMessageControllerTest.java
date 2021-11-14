@@ -1,5 +1,6 @@
-package com.chatapp.directmessage.directmessage_entity;
+package com.chatapp.directmessage.entity;
 
+import com.chatapp.directmessage.dto.DirectMessageDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.junit.jupiter.api.AfterEach;
@@ -49,7 +50,7 @@ class DirectMessageControllerTest {
 
     @AfterEach
     void tearDown() {
-    }
+    } 
 
     @Test
     void createMessage() throws Exception {
@@ -61,7 +62,7 @@ class DirectMessageControllerTest {
         message.setContent("hi");
 
         String json = writer.writeValueAsString(message);
-        Mockito.when(this.directMessageService.add(any(DirectMessage.class))).thenReturn(message.toDirectMessage());
+        Mockito.when(this.directMessageService.create(any(DirectMessage.class))).thenReturn(message.toDirectMessage());
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post(URL)
@@ -75,7 +76,7 @@ class DirectMessageControllerTest {
     void readMessage() throws Exception {
         DirectMessage message = new DirectMessage();
         message.setContent("blablabla");
-        Mockito.when(this.directMessageService.findById(any(UUID.class))).thenReturn(message);
+        Mockito.when(this.directMessageService.readById(any(UUID.class))).thenReturn(message);
         mockMvc.perform(MockMvcRequestBuilders
                         .get(URL + "/{messageId}", UUID.randomUUID()))
                 .andExpect(status().isFound())

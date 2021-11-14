@@ -1,5 +1,6 @@
-package com.chatapp.directmessage.directmessage_entity;
+package com.chatapp.directmessage.entity;
 
+import com.chatapp.directmessage.dto.DirectMessageDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -19,14 +20,14 @@ public record DirectMessageController(DirectMessageService directMessageService)
     @PostMapping()
     public DirectMessageDto.Return createMessage(@RequestBody DirectMessageDto.Create createDirectMessage, HttpServletResponse response) {
         response.setStatus(HttpStatus.CREATED.value());
-        return this.directMessageService.add(createDirectMessage.toDirectMessage()).toDirectMessageDtoReturn();
+        return this.directMessageService.create(createDirectMessage.toDirectMessage()).toDirectMessageDtoReturn();
     }
 
     @GetMapping(path = "{message_id}")
-    public DirectMessageDto.Create readMessage(HttpServletResponse response, @PathVariable("message_id") UUID messageId) throws IOException {
+    public DirectMessageDto.ReturnWithUsers readMessage(HttpServletResponse response, @PathVariable("message_id") UUID messageId) throws IOException {
         try {
             response.setStatus(HttpStatus.FOUND.value());
-            return this.directMessageService.findById(messageId).toDirectMessageDtoCreate();
+            return this.directMessageService.readMessageWithUsers(messageId);
         } catch (NoSuchElementException ex) {
             logger.trace("DirectMessage Controller - readMessage", ex);
             response.sendError(HttpStatus.NOT_FOUND.value(), DIRECT_MESSAGE_NOT_FOUND);

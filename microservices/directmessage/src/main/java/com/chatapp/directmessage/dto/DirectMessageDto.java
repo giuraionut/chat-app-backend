@@ -1,7 +1,11 @@
-package com.chatapp.directmessage.directmessage_entity;
+package com.chatapp.directmessage.dto;
 
+import com.chatapp.directmessage.entity.DirectMessage;
+import com.chatapp.directmessage.user.User;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 
@@ -40,6 +44,17 @@ public class DirectMessageDto {
             modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
             return modelMapper.map(this, DirectMessage.class);
         }
+    }
+
+    @Data
+    @EqualsAndHashCode
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ReturnWithUsers{
+        private User sender;
+        private User receiver;
+        private String content;
+        private Instant timestamp;
     }
 
     @Data

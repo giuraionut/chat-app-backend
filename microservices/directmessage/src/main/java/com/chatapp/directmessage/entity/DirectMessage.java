@@ -1,6 +1,7 @@
-package com.chatapp.directmessage.directmessage_entity;
+package com.chatapp.directmessage.entity;
 
 
+import com.chatapp.directmessage.dto.DirectMessageDto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
