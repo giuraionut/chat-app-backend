@@ -53,7 +53,7 @@ class DirectMessageControllerTest {
 
     @Test
     void createMessage() throws Exception {
-        DirectMessageDto.SendReceive message = new DirectMessageDto.SendReceive();
+        DirectMessageDto.Create message = new DirectMessageDto.Create();
         UUID senderId = UUID.randomUUID();
         UUID receiverId = UUID.randomUUID();
         message.setReceiverId(receiverId);

@@ -17,16 +17,16 @@ public record DirectMessageController(DirectMessageService directMessageService)
     private static final String DIRECT_MESSAGE_NOT_FOUND = "Direct message does not exists";
 
     @PostMapping()
-    public DirectMessageDto.SendReceive createMessage(@RequestBody DirectMessageDto.SendReceive sendReceiveDirectMessage, HttpServletResponse response) {
+    public DirectMessageDto.Return createMessage(@RequestBody DirectMessageDto.Create createDirectMessage, HttpServletResponse response) {
         response.setStatus(HttpStatus.CREATED.value());
-        return this.directMessageService.add(sendReceiveDirectMessage.toDirectMessage()).toDirectMessageDtoSendReceive();
+        return this.directMessageService.add(createDirectMessage.toDirectMessage()).toDirectMessageDtoReturn();
     }
 
     @GetMapping(path = "{message_id}")
-    public DirectMessageDto.SendReceive readMessage(HttpServletResponse response, @PathVariable("message_id") UUID messageId) throws IOException {
+    public DirectMessageDto.Create readMessage(HttpServletResponse response, @PathVariable("message_id") UUID messageId) throws IOException {
         try {
             response.setStatus(HttpStatus.FOUND.value());
-            return this.directMessageService.findById(messageId).toDirectMessageDtoSendReceive();
+            return this.directMessageService.findById(messageId).toDirectMessageDtoCreate();
         } catch (NoSuchElementException ex) {
             logger.trace("DirectMessage Controller - readMessage", ex);
             response.sendError(HttpStatus.NOT_FOUND.value(), DIRECT_MESSAGE_NOT_FOUND);
@@ -35,11 +35,11 @@ public record DirectMessageController(DirectMessageService directMessageService)
     }
 
     @PutMapping(path = "{message_id}")
-    public DirectMessageDto.SendReceive updateMessage(HttpServletResponse response, @RequestBody DirectMessageDto.Update updateDirectMessage,
-                                                      @PathVariable("message_id") UUID messageId) throws IOException {
+    public DirectMessageDto.Create updateMessage(HttpServletResponse response, @RequestBody DirectMessageDto.Update updateDirectMessage,
+                                                 @PathVariable("message_id") UUID messageId) throws IOException {
         try {
             response.setStatus(HttpStatus.OK.value());
-            return this.directMessageService.update(messageId, updateDirectMessage).toDirectMessageDtoSendReceive();
+            return this.directMessageService.update(messageId, updateDirectMessage).toDirectMessageDtoCreate();
         } catch (NoSuchElementException ex) {
             logger.trace("DirectMessage Controller - updateMessage", ex);
             response.sendError(HttpStatus.NOT_FOUND.value(), DIRECT_MESSAGE_NOT_FOUND);

@@ -32,11 +32,16 @@ public class DirectMessage {
     private String content;
     private Instant timestamp = Instant.now();
 
-
-    public DirectMessageDto.SendReceive toDirectMessageDtoSendReceive() {
+    public DirectMessageDto.Create toDirectMessageDtoCreate() {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        return modelMapper.map(this, DirectMessageDto.SendReceive.class);
+        return modelMapper.map(this, DirectMessageDto.Create.class);
+    }
+
+    public DirectMessageDto.Return toDirectMessageDtoReturn() {
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        return modelMapper.map(this, DirectMessageDto.Return.class);
     }
 
     @Override

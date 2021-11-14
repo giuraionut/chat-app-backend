@@ -7,7 +7,6 @@ import java.util.UUID;
 @Service
 public record DirectMessageService(DirectMessageRepository directMessageRepository) {
 
-
     public DirectMessage add(DirectMessage directMessage) {
         return this.directMessageRepository.save(directMessage);
     }
