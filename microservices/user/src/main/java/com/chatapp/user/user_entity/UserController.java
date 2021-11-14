@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 
 @RestController
@@ -41,6 +42,19 @@ public record UserController(UserService userService) {
             return null;
         }
     }
+
+    @GetMapping(path = "id/{id}")
+    public UserDto.Return readUserById(HttpServletResponse response, @PathVariable("id") UUID id) throws IOException {
+        try {
+            response.setStatus(HttpStatus.FOUND.value());
+            return this.userService.findById(id).toReturnDto();
+        } catch (NoSuchElementException ex) {
+            logger.trace("User Controller - readUser", ex);
+            response.sendError(HttpStatus.NOT_FOUND.value(), USER_NOT_FOUND);
+            return null;
+        }
+    }
+
 
     @PutMapping(path = "{username}")
     public UserDto.Return updateUser(HttpServletResponse response, @PathVariable("username") String username, @RequestBody UserDto.Update updateUserDto) throws IOException {

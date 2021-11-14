@@ -15,6 +15,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.UUID;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -62,6 +64,24 @@ class UserControllerTest {
         Mockito.when(userService.findByUsername(any(String.class))).thenReturn(returnUserDto.toUser());
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get(URL + "/{username}", returnUserDto.getUsername());
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isFound())
+                .andExpect(jsonPath("$.username").value(returnUserDto.getUsername()))
+                .andExpect(jsonPath("$.email").value(returnUserDto.getEmail()));
+
+    }
+
+    @Test
+    void readUserById() throws Exception {
+        UserDto.Return returnUserDto = new UserDto.Return();
+
+        returnUserDto.setUsername("test");
+        returnUserDto.setEmail("test@gmail.com");
+        returnUserDto.setAvatar("null");
+
+        Mockito.when(userService.findById(any(UUID.class))).thenReturn(returnUserDto.toUser());
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get(URL + "/id/{id}", UUID.randomUUID());
         mockMvc.perform(requestBuilder)
                 .andExpect(status().isFound())
                 .andExpect(jsonPath("$.username").value(returnUserDto.getUsername()))

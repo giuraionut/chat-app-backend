@@ -2,6 +2,8 @@ package com.chatapp.user.user_entity;
 
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public record UserService(UserRepository userRepository) {
 
@@ -23,5 +25,9 @@ public record UserService(UserRepository userRepository) {
     public void delete(String username) {
         final User user = findByUsername(username);
         this.userRepository.delete(user);
+    }
+
+    public User findById(UUID id) {
+        return this.userRepository.findById(id).orElseThrow();
     }
 }
