@@ -37,7 +37,6 @@ class UserControllerTest {
     private final ObjectMapper mapper = new ObjectMapper();
     private final ObjectWriter writer = mapper.writer();
 
-
     @Test
     void createUser() throws Exception {
 
@@ -47,7 +46,6 @@ class UserControllerTest {
         registerUserDto.setUsername("test@gmail.com");
 
         Mockito.when(userService.add(any(User.class))).thenReturn(registerUserDto.toUser());
-
         String json = writer.writeValueAsString(registerUserDto);
 
         mockMvc.perform(MockMvcRequestBuilders.post(URL).contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(status().isCreated());
