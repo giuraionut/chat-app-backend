@@ -11,10 +11,68 @@ spring:
           uri: lb://USER-SERVICE
           predicates:
             - Path=/api/v1/user/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: userService
+                fallbackUri: forward:/userServiceFallback
+            - name: Retry
+              args:
+                retries: 3
+                method: GET
+                backoff:
+                  firstBackoff: 50ms
+                  maxBackoff: 500ms
         - id: DIRECT-MESSAGE-SERVICE
           uri: lb://DIRECT-MESSAGE-SERVICE
           predicates:
             - Path=/api/v1/direct_message/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: directMessageService
+                fallbackUri: forward:/directMessageServiceFallback
+            - name: Retry
+              args:
+                retries: 3
+                method: GET
+                backoff:
+                  firstBackoff: 50ms
+                  maxBackoff: 500ms
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      userService:
+        slidingWindowSize: 10
+        permittedNumberOfCallsInHalfOpenState: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 15000
+        registerHealthIndicator: true
+      directMessageService:
+        slidingWindowSize: 10
+        permittedNumberOfCallsInHalfOpenState: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 15000
+        registerHealthIndicator: true
+  timelimiter:
+    instances:
+      userService:
+        timeoutDuration: 2s
+      directMessageService:
+        timeoutDuration: 2s
+
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
 
 eureka:
   client:
