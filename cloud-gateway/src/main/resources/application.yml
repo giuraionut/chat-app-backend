@@ -15,9 +15,9 @@ spring:
       default-filters:
         - name: RequestRateLimiter #redis rate limiter
           args:
-            redis-rate-limiter.replenishRate: 10
-            redis-rate-limiter.burstCapacity: 20
-            redis-rate-limiter.requestedTokens: 1
+            redis-rate-limiter.replenishRate: 50
+            redis-rate-limiter.burstCapacity: 250
+            redis-rate-limiter.requestedTokens: 25
 
       routes:
         - id: USER-SERVICE
@@ -40,6 +40,15 @@ spring:
                 name: directMessageService
                 fallbackUri: forward:/directMessageServiceFallback
 
+        - id: WEBSOCKET-SERVICE
+          uri: lb://WEBSOCKET
+          predicates:
+            - Path=/api/v1/websocket/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: webSocketService
+                fallbackUri: forward:/webSocketServiceFallback
 
 resilience4j:
   circuitbreaker:
@@ -59,11 +68,20 @@ resilience4j:
         waitDurationInOpenState: 15000
         registerHealthIndicator: true
 
+      webSocketService:
+        slidingWindowSize: 10
+        permittedNumberOfCallsInHalfOpenState: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 15000
+        registerHealthIndicator: true
+
   timelimiter:
     instances:
       userService:
         timeoutDuration: 2s
       directMessageService:
+        timeoutDuration: 2s
+      webSocketService:
         timeoutDuration: 2s
 
 management:

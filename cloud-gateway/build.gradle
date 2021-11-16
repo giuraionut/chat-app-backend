@@ -22,6 +22,7 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:3.0.4'
 	implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j:2.0.2'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive:2.5.6'
+	implementation 'io.github.resilience4j:resilience4j-micrometer:1.7.1'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test:2.5.6'
 }
 
