@@ -3,9 +3,22 @@ server:
 
 spring:
   application:
-    name: API-GATEWAY
+    name: API-GATEWAY #name of the app for eureka server
+
+  redis:
+    host: localhost
+    port: 6379 #redis port
+
   cloud:
     gateway:
+
+      default-filters:
+        - name: RequestRateLimiter #redis rate limiter
+          args:
+            redis-rate-limiter.replenishRate: 10
+            redis-rate-limiter.burstCapacity: 20
+            redis-rate-limiter.requestedTokens: 1
+
       routes:
         - id: USER-SERVICE
           uri: lb://USER-SERVICE
@@ -16,13 +29,7 @@ spring:
               args:
                 name: userService
                 fallbackUri: forward:/userServiceFallback
-            - name: Retry
-              args:
-                retries: 3
-                method: GET
-                backoff:
-                  firstBackoff: 50ms
-                  maxBackoff: 500ms
+
         - id: DIRECT-MESSAGE-SERVICE
           uri: lb://DIRECT-MESSAGE-SERVICE
           predicates:
@@ -32,29 +39,26 @@ spring:
               args:
                 name: directMessageService
                 fallbackUri: forward:/directMessageServiceFallback
-            - name: Retry
-              args:
-                retries: 3
-                method: GET
-                backoff:
-                  firstBackoff: 50ms
-                  maxBackoff: 500ms
+
 
 resilience4j:
   circuitbreaker:
     instances:
+
       userService:
         slidingWindowSize: 10
         permittedNumberOfCallsInHalfOpenState: 5
         failureRateThreshold: 50
         waitDurationInOpenState: 15000
         registerHealthIndicator: true
+
       directMessageService:
         slidingWindowSize: 10
         permittedNumberOfCallsInHalfOpenState: 5
         failureRateThreshold: 50
         waitDurationInOpenState: 15000
         registerHealthIndicator: true
+
   timelimiter:
     instances:
       userService:
