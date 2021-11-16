@@ -1,14 +1,9 @@
 server:
   port: 9245
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-  endpoint:
-    health:
-      show-details: always
+spring:
+  application:
+    name: SERVICE-MONITOR
 
 eureka:
   client:
@@ -19,6 +14,11 @@ eureka:
   instance:
     hostname: localhost
 
-spring:
-  application:
-    name: SERVICE-MONITOR
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
