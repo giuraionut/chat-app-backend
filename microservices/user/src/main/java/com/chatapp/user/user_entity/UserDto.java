@@ -1,10 +1,10 @@
 package com.chatapp.user.user_entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.EqualsAndHashCode;
 import org.modelmapper.ModelMapper;
+
+import java.util.UUID;
 
 @Data
 public class UserDto {
@@ -25,6 +25,7 @@ public class UserDto {
 
     @Data
     public static class Return {
+        private UUID id;
         private String username;
         private String email;
         private String avatar;
@@ -48,4 +49,9 @@ public class UserDto {
         }
     }
 
+    @Data
+    @EqualsAndHashCode
+    public static class Identifier {
+        private UUID id;
+    }
 }

@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -31,11 +33,11 @@ public record UserController(UserService userService) {
         }
     }
 
-    @GetMapping(path = "{username}")
-    public UserDto.Return readUser(HttpServletResponse response, @PathVariable("username") String username) throws IOException {
+    @GetMapping(path = "{userId}")
+    public UserDto.Return readUserById(HttpServletResponse response, @PathVariable("userId") UUID userId) throws IOException {
         try {
             response.setStatus(HttpStatus.FOUND.value());
-            return this.userService.findByUsername(username).toReturnDto();
+            return this.userService.findById(userId).toReturnDto();
         } catch (NoSuchElementException ex) {
             logger.trace("User Controller - readUser", ex);
             response.sendError(HttpStatus.NOT_FOUND.value(), USER_NOT_FOUND);
@@ -43,24 +45,12 @@ public record UserController(UserService userService) {
         }
     }
 
-    @GetMapping(path = "id/{id}")
-    public UserDto.Return readUserById(HttpServletResponse response, @PathVariable("id") UUID id) throws IOException {
-        try {
-            response.setStatus(HttpStatus.FOUND.value());
-            return this.userService.findById(id).toReturnDto();
-        } catch (NoSuchElementException ex) {
-            logger.trace("User Controller - readUser", ex);
-            response.sendError(HttpStatus.NOT_FOUND.value(), USER_NOT_FOUND);
-            return null;
-        }
-    }
-
-
-    @PutMapping(path = "{username}")
-    public UserDto.Return updateUser(HttpServletResponse response, @PathVariable("username") String username, @RequestBody UserDto.Update updateUserDto) throws IOException {
+    @PutMapping(path = "{userId}")
+    public UserDto.Return updateUser(HttpServletResponse response, @PathVariable("userId") UUID userId,
+                                     @RequestBody UserDto.Update updateUserDto) throws IOException {
         try {
             response.setStatus(HttpStatus.OK.value());
-            return this.userService.update(username, updateUserDto).toReturnDto();
+            return this.userService.update(userId, updateUserDto).toReturnDto();
         } catch (NoSuchElementException ex) {
             logger.trace("User Controller - updateUser", ex);
             response.sendError(HttpStatus.NOT_FOUND.value(), USER_NOT_FOUND);
@@ -68,14 +58,16 @@ public record UserController(UserService userService) {
         }
     }
 
-    @DeleteMapping(path = "{username}")
-    public void deleteUser(HttpServletResponse response, @PathVariable("username") String username) throws IOException {
+    @DeleteMapping(path = "{userId}")
+    public void deleteUser(HttpServletResponse response, @PathVariable("userId") UUID userId) throws IOException {
         try {
-            this.userService.delete(username);
+            this.userService.delete(userId);
             response.setStatus(HttpStatus.OK.value());
         } catch (NoSuchElementException ex) {
             logger.trace("User Controller - deleteUser", ex);
             response.sendError(HttpStatus.NOT_FOUND.value(), USER_NOT_FOUND);
         }
     }
+
+    //------------------------------------------------------------------------------------------------------------------
 }

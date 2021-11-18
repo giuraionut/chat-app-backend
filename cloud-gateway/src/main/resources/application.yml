@@ -30,25 +30,25 @@ spring:
                 name: userService
                 fallbackUri: forward:/userServiceFallback
 
-        - id: DIRECT-MESSAGE-SERVICE
-          uri: lb://DIRECT-MESSAGE-SERVICE
+        - id: MESSAGE-SERVICE
+          uri: lb://MESSAGE-SERVICE
           predicates:
-            - Path=/api/v1/direct_message/**
+            - Path=/api/v1/message/**
           filters:
             - name: CircuitBreaker
               args:
-                name: directMessageService
-                fallbackUri: forward:/directMessageServiceFallback
+                name: messageService
+                fallbackUri: forward:/messageServiceFallback
 
-        - id: WEBSOCKET-SERVICE
-          uri: lb://WEBSOCKET
+        - id: CHANNEL-SERVICE
+          uri: lb://CHANNEL-SERVICE
           predicates:
-            - Path=/api/v1/websocket/**
+            - Path=/api/v1/channel/**
           filters:
             - name: CircuitBreaker
               args:
-                name: webSocketService
-                fallbackUri: forward:/webSocketServiceFallback
+                name: channelService
+                fallbackUri: forward:/channelServiceFallback
 
 resilience4j:
   circuitbreaker:
@@ -61,14 +61,14 @@ resilience4j:
         waitDurationInOpenState: 15000
         registerHealthIndicator: true
 
-      directMessageService:
+      messageService:
         slidingWindowSize: 10
         permittedNumberOfCallsInHalfOpenState: 5
         failureRateThreshold: 50
         waitDurationInOpenState: 15000
         registerHealthIndicator: true
 
-      webSocketService:
+      channelService:
         slidingWindowSize: 10
         permittedNumberOfCallsInHalfOpenState: 5
         failureRateThreshold: 50
@@ -79,9 +79,9 @@ resilience4j:
     instances:
       userService:
         timeoutDuration: 2s
-      directMessageService:
+      messageService:
         timeoutDuration: 2s
-      webSocketService:
+      channelService:
         timeoutDuration: 2s
 
 management:

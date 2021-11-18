@@ -99,7 +99,7 @@ class UserControllerTest {
         updateUserDto.setAvatar("https://test123.avatar.com");
 
         final String json = writer.writeValueAsString(updateUserDto);
-        Mockito.when(this.userService.update(any(String.class), any(UserDto.Update.class)))
+        Mockito.when(this.userService.update(any(UUID.class), any(UserDto.Update.class)))
                 .thenReturn(updateUserDto.toUser());
 
         mockMvc.perform(MockMvcRequestBuilders

@@ -12,13 +12,13 @@ public class FallbackController {
         return Mono.just("There is a problem with USER-SERVICE. Please try again later");
     }
 
-    @GetMapping("/directMessageServiceFallback")
-    public Mono<String> directMessageServiceFallback() {
-        return Mono.just("There is a problem with DIRECT-MESSAGE-SERVICE. Please try again later");
+    @GetMapping("/messageServiceFallback")
+    public Mono<String> messageServiceFallback() {
+        return Mono.just("There is a problem with MESSAGE-SERVICE. Please try again later");
     }
 
-    @GetMapping("/webSocketServiceFallback")
-    public Mono<String> webSocketServiceFallback() {
-        return Mono.just("There is a problem with the WEBSOCKET. Please try again later");
+    @GetMapping("/channelServiceFallback")
+    public Mono<String> channelServiceFallback() {
+        return Mono.just("There is a problem with the CHANNEL-SERVICE. Please try again later");
     }
 }
