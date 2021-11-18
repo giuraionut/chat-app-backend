@@ -57,11 +57,11 @@ public record MessageService(MessageRepository messageRepository, RestTemplate r
         final User s1 = sender1;
         final User s2 = sender2;
         chatHistory.forEach(message -> {
-            if(message.getSenderId().equals(recipientId))
-            historyChatHistory.add(new MessageDto.Built(s2, message.getContent(), message.getTimestamp()));
-            else
+            if (message.getSenderId().equals(recipientId)) {
+                historyChatHistory.add(new MessageDto.Built(s2, message.getContent(), message.getTimestamp()));
+            } else {
                 historyChatHistory.add(new MessageDto.Built(s1, message.getContent(), message.getTimestamp()));
-
+            }
         });
         return historyChatHistory;
     }

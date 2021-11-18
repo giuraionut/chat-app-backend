@@ -7,7 +7,6 @@ import lombok.ToString;
 import org.modelmapper.ModelMapper;
 
 import javax.persistence.*;
-import java.util.Set;
 import java.util.UUID;
 
 @Entity
