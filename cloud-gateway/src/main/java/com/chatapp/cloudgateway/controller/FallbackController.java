@@ -11,5 +11,8 @@ public class FallbackController {
     public Mono<String> messageServiceFallback() {
         return Mono.just("There is a problem with MESSAGE-SERVICE. Please try again later");
     }
-
+    @GetMapping("/socketServiceFallback")
+    public Mono<String> socketServiceFallback() {
+        return Mono.just("There is a problem with SOCKET-SERVICE. Please try again later");
+    }
 }

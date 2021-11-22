@@ -62,6 +62,17 @@ spring:
                 name: messageService
                 fallbackUri: forward:/messageServiceFallback
 
+        - id: SOCKET-SERVICE
+          uri: lb://SOCKET-SERVICE
+          predicates:
+            - Path=/chat.sendMessage
+            - Path=/topic/public
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: socketService
+                fallbackUri: forward:/socketServiceFallback
+
 
 resilience4j:
   circuitbreaker:
@@ -74,11 +85,21 @@ resilience4j:
         waitDurationInOpenState: 15000
         registerHealthIndicator: true
 
+      socketService:
+        slidingWindowSize: 10
+        permittedNumberOfCallsInHalfOpenState: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 15000
+        registerHealthIndicator: true
+
 
   timelimiter:
     instances:
 
       messageService:
+        timeoutDuration: 2s
+
+      socketService:
         timeoutDuration: 2s
 
 
