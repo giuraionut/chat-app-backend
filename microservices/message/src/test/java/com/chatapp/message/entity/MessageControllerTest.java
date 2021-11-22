@@ -1,6 +1,7 @@
 package com.chatapp.message.entity;
 
 import com.chatapp.message.dto.MessageDto;
+import com.chatapp.message.websocket.SocketService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.junit.jupiter.api.AfterEach;
@@ -36,6 +37,9 @@ class MessageControllerTest {
     private MessageService messageService;
 
     @MockBean
+    private SocketService socketService;
+
+    @MockBean
     private MessageRepository messageRepository;
 
     @InjectMocks
@@ -59,23 +63,22 @@ class MessageControllerTest {
     void createMessage() throws Exception {
         MessageDto.Pure message = new MessageDto.Pure();
         UUID senderId = UUID.randomUUID();
-        UUID channelId = UUID.randomUUID();
-        message.setChannelId(channelId);
+        UUID recipientId = UUID.randomUUID();
+        message.setRecipientId(recipientId);
         message.setSenderId(senderId);
         message.setContent("hi");
 
-        MessageDto.Built messageHistory = new MessageDto.Built();
-        messageHistory.setContent(message.getContent());
+        MessageDto.Built builtMessage = new MessageDto.Built();
+        builtMessage.setContent(message.getContent());
         String json = writer.writeValueAsString(message);
         Mockito.when(this.messageService.create(any(Message.class))).thenReturn(message.toMessage());
-        Mockito.when(this.messageService.buildMessage(any(UUID.class))).thenReturn(messageHistory);
-
+        Mockito.when(this.messageService.buildMessage(any(UUID.class))).thenReturn(builtMessage);
         final MvcResult result = mockMvc.perform(MockMvcRequestBuilders
                         .post(URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.content").value(messageHistory.getContent()))
+                .andExpect(jsonPath("$.content").value(builtMessage.getContent()))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }

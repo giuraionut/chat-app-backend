@@ -2,12 +2,35 @@ server:
   port: 9191
 
 spring:
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            auth-server-url: http://192.168.0.103:9990/auth
+            realm: chat-app-realm
+            issuer-uri: http://192.168.0.103:9990/auth/realms/chat-app-realm
+        registration:
+          keycloak-gateway:
+            provider: keycloak
+            client-id: chat-app-client
+            client-secret: c22a1d71-df57-4ab2-9998-6d96239d4453
+            client-name: chatapp
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
   application:
     name: API-GATEWAY #name of the app for eureka server
 
   redis:
     host: localhost
     port: 6379 #redis port
+    connect-timeout: 30s
+    timeout: 500ms
+  session:
+    store-type: redis
+    timeout: 10m
+    redis:
+      namespace: chatapp:gateway
 
   cloud:
     gateway:
@@ -19,6 +42,8 @@ spring:
             allowedHeaders: "*"
             
       default-filters:
+        - SaveSession
+        - TokenRelay
         - name: RequestRateLimiter #redis rate limiter
           args:
             redis-rate-limiter.replenishRate: 50
@@ -26,15 +51,6 @@ spring:
             redis-rate-limiter.requestedTokens: 25
 
       routes:
-        - id: USER-SERVICE
-          uri: lb://USER-SERVICE
-          predicates:
-            - Path=/api/v1/user/**
-          filters:
-            - name: CircuitBreaker
-              args:
-                name: userService
-                fallbackUri: forward:/userServiceFallback
 
         - id: MESSAGE-SERVICE
           uri: lb://MESSAGE-SERVICE
@@ -46,27 +62,11 @@ spring:
                 name: messageService
                 fallbackUri: forward:/messageServiceFallback
 
-        - id: CHANNEL-SERVICE
-          uri: lb://CHANNEL-SERVICE
-          predicates:
-            - Path=/api/v1/channel/**
-          filters:
-            - name: CircuitBreaker
-              args:
-                name: channelService
-                fallbackUri: forward:/channelServiceFallback
 
 resilience4j:
   circuitbreaker:
     instances:
 
-      userService:
-        slidingWindowSize: 10
-        permittedNumberOfCallsInHalfOpenState: 5
-        failureRateThreshold: 50
-        waitDurationInOpenState: 15000
-        registerHealthIndicator: true
-
       messageService:
         slidingWindowSize: 10
         permittedNumberOfCallsInHalfOpenState: 5
@@ -74,21 +74,13 @@ resilience4j:
         waitDurationInOpenState: 15000
         registerHealthIndicator: true
 
-      channelService:
-        slidingWindowSize: 10
-        permittedNumberOfCallsInHalfOpenState: 5
-        failureRateThreshold: 50
-        waitDurationInOpenState: 15000
-        registerHealthIndicator: true
 
   timelimiter:
     instances:
-      userService:
-        timeoutDuration: 2s
+
       messageService:
         timeoutDuration: 2s
-      channelService:
-        timeoutDuration: 2s
+
 
 management:
   health:
@@ -97,7 +89,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health
+        include: "*"
   endpoint:
     health:
       show-details: always

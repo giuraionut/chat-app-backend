@@ -30,6 +30,7 @@ public class Message {
     private UUID senderId;
     private UUID recipientId;
     private String content;
+    private Boolean seen = false;
     private Instant timestamp = Instant.now();
 
     public MessageDto.Pure toPureMessage() {

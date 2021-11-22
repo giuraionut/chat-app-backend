@@ -30,6 +30,8 @@ dependencies {
 	implementation 'org.modelmapper:modelmapper-module-jsr310:1.2.2'
 	implementation 'org.apache.maven.surefire:surefire-booter:3.0.0-M5'
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:3.0.4'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server:2.5.6'
+	implementation 'org.keycloak:keycloak-spring-boot-starter:15.0.2'
 
 	implementation 'org.springframework.boot:spring-boot-starter-websocket:2.5.6'
     implementation 'com.google.guava:guava:31.0.1-jre'

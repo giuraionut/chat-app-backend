@@ -1,0 +1,42 @@
+version: "3"
+
+volumes:
+  postgres_data:
+      driver: local
+
+services:
+
+  postgres:
+    container_name: POSTGRES
+    image: postgres
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+    ports:
+      - 5432:5432
+
+  keycloak:
+    container_name: KEYCLOAK
+    image: jboss/keycloak
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_SCHEMA: public
+      DB_PASSWORD: password
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: password
+      PROXY_ADDRESS_FORWARDING: "true"
+    ports:
+      - 9990:8080
+      - 9991:8443
+    depends_on:
+      - postgres
+
+  redis:
+    container_name: REDIS
+    image: redis
+    ports:
+      - 6379:6379

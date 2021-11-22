@@ -1,7 +1,6 @@
 package com.chatapp.message.dto;
 
 import com.chatapp.message.entity.Message;
-import com.chatapp.message.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -36,7 +35,7 @@ public class MessageDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Built {
-        private User sender;
+        private UUID sender;
         private String content;
         private Instant timestamp;
     }

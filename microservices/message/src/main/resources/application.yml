@@ -8,5 +8,19 @@ eureka:
     hostname: localhost
 
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://192.168.0.103:9990/auth/realms/chat-app-realm/protocol/openid-connect/certs
   application:
     name: MESSAGE-SERVICE
+
+
+keycloak:
+  realm: chat-app-realm
+  resource: chat-app-client
+  public-client: false
+  auth-server-url: http://192.168.0.103:9990/auth
+  ssl-required: external
+  bearer-only: true
