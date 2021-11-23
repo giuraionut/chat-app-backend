@@ -39,7 +39,7 @@ public class BearerTokenAuthenticator {
         return mapper;
     }
 
-    public Authentication authenticate(String authHeaderValue)  {
+    public Authentication authenticate(String authHeaderValue) {
         return authenticateBearerToken(getBearerTokenFromHeader(authHeaderValue));
     }
 
@@ -62,23 +62,23 @@ public class BearerTokenAuthenticator {
         KeycloakPrincipal<RefreshableKeycloakSecurityContext> keycloakPrincipal =
                 new KeycloakPrincipal<>(
                         AdapterUtils.getPrincipalName(deployment, token)
-                        ,context);
+                        , context);
 
         KeycloakAuthenticationToken keycloakAuthenticationToken = new KeycloakAuthenticationToken(
                 new SimpleKeycloakAccount(keycloakPrincipal, AdapterUtils.getRolesFromSecurityContext(context), context)
-                ,false);
+                , false);
         return keycloakAuthenticationProvider.authenticate(keycloakAuthenticationToken);
     }
 
     private RefreshableKeycloakSecurityContext getContext(String tokenString, AccessToken token) {
         return new RefreshableKeycloakSecurityContext(
                 deployment
-                ,null
-                ,tokenString
-                ,token
-                ,null
-                ,null
-                ,null);
+                , null
+                , tokenString
+                , token
+                , null
+                , null
+                , null);
     }
 
     private AccessToken authenticateToken(String tokenString) {

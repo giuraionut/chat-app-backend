@@ -15,6 +15,7 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+
 @KeycloakConfiguration
 public class KeycloakSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
 
@@ -29,9 +30,6 @@ public class KeycloakSecurityConfig extends KeycloakWebSecurityConfigurerAdapter
         return keycloakConfigResolver().resolve(null);
     }
 
-    /**
-     * Defines the session authentication strategy.
-     */
     @Bean
     @Override
     protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
@@ -57,8 +55,7 @@ public class KeycloakSecurityConfig extends KeycloakWebSecurityConfigurerAdapter
     }
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception
-    {
+    protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
         http
                 .csrf().disable()

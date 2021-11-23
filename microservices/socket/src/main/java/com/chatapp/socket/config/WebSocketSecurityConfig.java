@@ -1,5 +1,6 @@
 package com.chatapp.socket.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -12,6 +13,21 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 @Import({KeycloakSecurityConfig.class})
 @EnableWebSocketMessageBroker
 public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBrokerConfigurer {
+
+    @Value("${rabbitmq.relay-host}")
+    private String relayHost;
+    @Value("${rabbitmq.relay-port}")
+    private int relayPort;
+    @Value("${rabbitmq.virtual-host}")
+    private String virtualHost;
+    @Value("${rabbitmq.client-login}")
+    private String clientLogin;
+    @Value("${rabbitmq.client-passcode}")
+    private String clientPasscode;
+    @Value("${rabbitmq.system-login}")
+    private String systemLogin;
+    @Value("${rabbitmq.system-passcode}")
+    private String systemPasscode;
 
     @Override
     protected boolean sameOriginDisabled() {
@@ -29,7 +45,7 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws").setHandshakeHandler(new HSHandler())
+        registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
     }
@@ -37,6 +53,13 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setApplicationDestinationPrefixes("/app");
-        registry.enableSimpleBroker("/topic", "/queue");
+        registry.enableStompBrokerRelay("/topic", "/queue")
+                .setRelayHost(relayHost)
+                .setRelayPort(relayPort)
+                .setVirtualHost(virtualHost)
+                .setClientLogin(clientLogin)
+                .setClientPasscode(clientPasscode)
+                .setSystemLogin(systemLogin)
+                .setSystemPasscode(systemPasscode);
     }
 }

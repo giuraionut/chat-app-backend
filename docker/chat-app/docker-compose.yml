@@ -1,8 +1,9 @@
-version: "3"
+version: "3.8"
 
 volumes:
   postgres_data:
       driver: local
+  prometheus_data: {}
 
 services:
 
@@ -40,3 +41,38 @@ services:
     image: redis
     ports:
       - 6379:6379
+
+  rabbitmq:
+    container_name: RABBITMQ
+    image: bitnami/rabbitmq
+    environment:
+      - RABBITMQ_PLUGINS=rabbitmq_management,rabbitmq_stomp,rabbitmq_web_stomp,rabbitmq_stream,rabbitmq_top
+    ports:
+      - 5672:5672
+      - 15672:15672
+      - 61613:61613
+    networks:
+      - rabbitmq_go_net
+
+  prometheus:
+    container_name: PROMETHEUS
+    image: prom/prometheus
+    ports:
+      - 9090:9090
+    volumes: 
+      - ./prometheus/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'  
+
+  grafana:
+    container_name: GRAFANA
+    image: grafana/grafana
+    links: 
+      - prometheus
+    ports:
+      - 3001:3000
+
+networks:
+  rabbitmq_go_net:
+    driver: bridge

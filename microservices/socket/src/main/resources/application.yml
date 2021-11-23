@@ -8,12 +8,16 @@ keycloak:
   resource: chat-app-client
   ssl-required: external
 
-
 spring:
   main:
     allow-circular-references: true
   application:
     name: SOCKET-SERVICE
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://192.168.0.103:9990/auth/realms/chat-app-realm/protocol/openid-connect/certs
 
 eureka:
   client:
@@ -23,3 +27,13 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
   instance:
     hostname: localhost
+
+rabbitmq:
+  relay-host: localhost
+  relay-port: 61613
+  virtual-host: /
+  client-login: user
+  client-passcode: bitnami
+  system-login: user
+  system-passcode: bitnami
+

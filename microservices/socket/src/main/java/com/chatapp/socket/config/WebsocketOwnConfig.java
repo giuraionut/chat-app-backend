@@ -36,7 +36,6 @@ public class WebsocketOwnConfig implements WebSocketMessageBrokerConfigurer {
                     if (authHeader != null) {
                         accessor.setUser(bearerTokenAuthenticator.authenticate(authHeader));
                     }
-                    System.out.println(accessor.getUser().getName() + " CONNECTED");
                 }
                 return message;
             }

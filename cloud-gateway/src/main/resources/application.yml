@@ -65,8 +65,7 @@ spring:
         - id: SOCKET-SERVICE
           uri: lb://SOCKET-SERVICE
           predicates:
-            - Path=/chat.sendMessage
-            - Path=/topic/public
+            - Path=/api/v1/socket/**
           filters:
             - name: CircuitBreaker
               args:

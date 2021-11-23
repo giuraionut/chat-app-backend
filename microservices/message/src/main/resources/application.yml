@@ -1,6 +1,8 @@
+server:
+  port: 8081
+
 eureka:
   client:
-    register-with-eureka: true
     fetch-registry: true
     service-url:
       defaultZone: http://localhost:8761/eureka/
@@ -15,7 +17,6 @@ spring:
           jwk-set-uri: http://192.168.0.103:9990/auth/realms/chat-app-realm/protocol/openid-connect/certs
   application:
     name: MESSAGE-SERVICE
-
 
 keycloak:
   realm: chat-app-realm
