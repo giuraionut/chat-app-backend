@@ -1,6 +1,5 @@
 package com.chatapp.socket.config;
 
-
 import org.keycloak.adapters.KeycloakConfigResolver;
 import org.keycloak.adapters.KeycloakDeployment;
 import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
@@ -14,7 +13,6 @@ import org.springframework.security.web.authentication.session.NullAuthenticated
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
 
 @KeycloakConfiguration
 public class KeycloakSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
