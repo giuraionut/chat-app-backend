@@ -70,4 +70,5 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
         return new RememberDestination();
     }
 
+
 }

@@ -67,7 +67,7 @@ class MessageControllerTest {
         MessageDto.Display displayMessage = new MessageDto.Display();
         displayMessage.setContent(message.getContent());
         String json = writer.writeValueAsString(message);
-        Mockito.when(this.messageService.create(any(Message.class))).thenReturn(message.toMessage());
+        Mockito.when(this.messageService.create(any(MessageEntity.class))).thenReturn(message.toMessageEntity());
         Mockito.when(this.messageService.buildMessage(any(UUID.class))).thenReturn(displayMessage);
         final MvcResult result = mockMvc.perform(MockMvcRequestBuilders
                         .post(URL)
@@ -81,15 +81,15 @@ class MessageControllerTest {
 
     @Test
     void readMessage() throws Exception {
-        Message message = new Message();
-        message.setContent("blablabla");
+        MessageEntity messageEntity = new MessageEntity();
+        messageEntity.setContent("blablabla");
         MessageDto.Display messageWithUsers = new MessageDto.Display();
-        messageWithUsers.setContent(message.getContent());
+        messageWithUsers.setContent(messageEntity.getContent());
         Mockito.when(this.messageService.buildMessage(any(UUID.class))).thenReturn(messageWithUsers);
         mockMvc.perform(MockMvcRequestBuilders
                         .get(URL + "/{messageId}", UUID.randomUUID()))
                 .andExpect(status().isFound())
-                .andExpect(jsonPath("$.content").value(message.getContent()))
+                .andExpect(jsonPath("$.content").value(messageEntity.getContent()))
                 .andReturn();
     }
 
@@ -99,7 +99,7 @@ class MessageControllerTest {
         update.setContent("blablabla");
         final String json = writer.writeValueAsString(update);
         Mockito.when(this.messageService.update(any(UUID.class), any(MessageDto.Update.class)))
-                .thenReturn(update.toMessage());
+                .thenReturn(update.toMessageEntity());
 
         mockMvc.perform(MockMvcRequestBuilders
                         .put(URL + "/{messageId}", UUID.randomUUID())

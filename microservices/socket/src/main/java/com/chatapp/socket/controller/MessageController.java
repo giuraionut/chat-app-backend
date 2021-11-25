@@ -6,10 +6,12 @@ import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -52,4 +54,5 @@ public class MessageController {
         messagingTemplate.convertAndSend("/user/" + token.getAccount().getPrincipal().getName() + "/queue/private", message); // self
 //      keycloakRestTemplate.postForLocation(Route.MESSAGE.CREATE, message.toPersist());
     }
+
 }

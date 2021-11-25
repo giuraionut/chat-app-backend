@@ -16,24 +16,24 @@ import java.util.UUID;
 @RestController
 @RequestMapping(path = "api/v1/message")
 public record MessageController(MessageService messageService) {
-    private static final String MESSAGE_NOT_FOUND = "Message does not exists";
+    private static final String MESSAGE_NOT_FOUND = "MessageEntity does not exists";
     private static final String CONVERSATION_NOT_FOUND = "Conversation does not exists";
 
-    private static final Logger logger = LoggerFactory.getLogger(MessageController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageController.class);
 
     @PostMapping()
     public MessageDto.Display createMessage(@RequestBody MessageDto.Base baseMessage, HttpServletResponse response, Principal principal) {
         response.setStatus(HttpStatus.CREATED.value());
-        final Message createdMessage = this.messageService.create(baseMessage.toMessage());
-        logger.info(principal.getName());
-        return this.messageService.buildMessage(createdMessage.getId());
+        final MessageEntity createdMessageEntity = this.messageService.create(baseMessage.toMessageEntity());
+        LOGGER.info(principal.getName());
+        return this.messageService.buildMessage(createdMessageEntity.getId());
     }
 
     @GetMapping(path = "{messageId}")
     public MessageDto.Base readMessage(HttpServletResponse response, @PathVariable("messageId") UUID messageId) {
         try {
             response.setStatus(HttpStatus.FOUND.value());
-            return this.messageService.findById(messageId).toPureMessage();
+            return this.messageService.findById(messageId).toBaseMessage();
         } catch (NoSuchElementException ex) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     MESSAGE_NOT_FOUND);
@@ -57,7 +57,7 @@ public record MessageController(MessageService messageService) {
                                          @PathVariable("messageId") UUID messageId){
         try {
             response.setStatus(HttpStatus.OK.value());
-            return this.messageService.update(messageId, updateMessage).toPureMessage();
+            return this.messageService.update(messageId, updateMessage).toBaseMessage();
         } catch (NoSuchElementException ex) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     MESSAGE_NOT_FOUND);

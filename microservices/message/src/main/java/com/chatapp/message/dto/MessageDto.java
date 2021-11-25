@@ -1,9 +1,8 @@
 package com.chatapp.message.dto;
 
-import com.chatapp.message.entity.Message;
+import com.chatapp.message.entity.MessageEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -23,10 +22,10 @@ public class MessageDto {
         private String content;
         private Instant timestamp;
 
-        public Message toMessage() {
+        public MessageEntity toMessageEntity() {
             ModelMapper modelMapper = new ModelMapper();
             modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-            return modelMapper.map(this, Message.class);
+            return modelMapper.map(this, MessageEntity.class);
         }
     }
 
@@ -43,10 +42,10 @@ public class MessageDto {
     public static class Update {
         private String content;
 
-        public Message toMessage() {
+        public MessageEntity toMessageEntity() {
             ModelMapper modelMapper = new ModelMapper();
             modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-            return modelMapper.map(this, Message.class);
+            return modelMapper.map(this, MessageEntity.class);
         }
     }
 

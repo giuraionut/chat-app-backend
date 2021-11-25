@@ -21,7 +21,7 @@ import java.util.UUID;
 @Setter
 @ToString
 @RequiredArgsConstructor
-public class Message {
+public class MessageEntity {
     @Id
     @GeneratedValue
     @Column(name = "id", nullable = false)
@@ -33,7 +33,7 @@ public class Message {
     private Boolean seen = false;
     private Instant timestamp = Instant.now();
 
-    public MessageDto.Base toPureMessage() {
+    public MessageDto.Base toBaseMessage() {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         return modelMapper.map(this, MessageDto.Base.class);
@@ -43,7 +43,7 @@ public class Message {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Message that = (Message) o;
+        MessageEntity that = (MessageEntity) o;
         return id != null && Objects.equals(id, that.id);
     }
 

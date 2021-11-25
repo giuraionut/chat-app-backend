@@ -62,6 +62,16 @@ spring:
                 name: messageService
                 fallbackUri: forward:/messageServiceFallback
 
+        - id: GROUP-SERVICE
+          uri: lb://GROUP-SERVICE
+          predicates:
+            - Path=/api/v1/group/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: groupService
+                fallbackUri: forward:/groupServiceFallback
+
         - id: SOCKET-SERVICE
           uri: lb://SOCKET-SERVICE
           predicates:
@@ -91,6 +101,12 @@ resilience4j:
         waitDurationInOpenState: 15000
         registerHealthIndicator: true
 
+      groupService:
+        slidingWindowSize: 10
+        permittedNumberOfCallsInHalfOpenState: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 15000
+        registerHealthIndicator: true
 
   timelimiter:
     instances:
@@ -99,6 +115,9 @@ resilience4j:
         timeoutDuration: 2s
 
       socketService:
+        timeoutDuration: 2s
+
+      groupService:
         timeoutDuration: 2s
 
 

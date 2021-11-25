@@ -9,6 +9,14 @@ eureka:
   instance:
     hostname: localhost
 
+keycloak:
+  realm: chat-app-realm
+  resource: chat-app-client
+  public-client: false
+  auth-server-url: http://192.168.0.103:9990/auth
+  ssl-required: external
+  bearer-only: true
+
 spring:
   security:
     oauth2:
@@ -17,11 +25,24 @@ spring:
           jwk-set-uri: http://192.168.0.103:9990/auth/realms/chat-app-realm/protocol/openid-connect/certs
   application:
     name: MESSAGE-SERVICE
-
-keycloak:
-  realm: chat-app-realm
-  resource: chat-app-client
-  public-client: false
-  auth-server-url: http://192.168.0.103:9990/auth
-  ssl-required: external
-  bearer-only: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/group
+    username: keycloak
+    password: password
+    driver-class-name: org.postgresql.Driver
+    testWhileIdle: true
+    validationQuery: SELECT 1
+  jpa:
+    show-sql: true
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyHbmImpl
+        physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  jackson:
+    serialization:
+      write_dates_as_timestamps: false
