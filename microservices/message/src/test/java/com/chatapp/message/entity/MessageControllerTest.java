@@ -1,7 +1,6 @@
 package com.chatapp.message.entity;
 
 import com.chatapp.message.dto.MessageDto;
-import com.chatapp.message.websocket.SocketService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.junit.jupiter.api.AfterEach;
@@ -37,9 +36,6 @@ class MessageControllerTest {
     private MessageService messageService;
 
     @MockBean
-    private SocketService socketService;
-
-    @MockBean
     private MessageRepository messageRepository;
 
     @InjectMocks
@@ -61,24 +57,24 @@ class MessageControllerTest {
 
     @Test
     void createMessage() throws Exception {
-        MessageDto.Pure message = new MessageDto.Pure();
+        MessageDto.Base message = new MessageDto.Base();
         UUID senderId = UUID.randomUUID();
         UUID recipientId = UUID.randomUUID();
         message.setRecipientId(recipientId);
         message.setSenderId(senderId);
         message.setContent("hi");
 
-        MessageDto.Built builtMessage = new MessageDto.Built();
-        builtMessage.setContent(message.getContent());
+        MessageDto.Display displayMessage = new MessageDto.Display();
+        displayMessage.setContent(message.getContent());
         String json = writer.writeValueAsString(message);
         Mockito.when(this.messageService.create(any(Message.class))).thenReturn(message.toMessage());
-        Mockito.when(this.messageService.buildMessage(any(UUID.class))).thenReturn(builtMessage);
+        Mockito.when(this.messageService.buildMessage(any(UUID.class))).thenReturn(displayMessage);
         final MvcResult result = mockMvc.perform(MockMvcRequestBuilders
                         .post(URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.content").value(builtMessage.getContent()))
+                .andExpect(jsonPath("$.content").value(displayMessage.getContent()))
                 .andDo(MockMvcResultHandlers.print())
                 .andReturn();
     }
@@ -87,7 +83,7 @@ class MessageControllerTest {
     void readMessage() throws Exception {
         Message message = new Message();
         message.setContent("blablabla");
-        MessageDto.Built messageWithUsers = new MessageDto.Built();
+        MessageDto.Display messageWithUsers = new MessageDto.Display();
         messageWithUsers.setContent(message.getContent());
         Mockito.when(this.messageService.buildMessage(any(UUID.class))).thenReturn(messageWithUsers);
         mockMvc.perform(MockMvcRequestBuilders

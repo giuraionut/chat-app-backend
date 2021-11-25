@@ -1,11 +1,14 @@
 package com.chatapp.message.entity;
 
 import com.chatapp.message.dto.MessageDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletResponse;
+import java.security.Principal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -16,15 +19,18 @@ public record MessageController(MessageService messageService) {
     private static final String MESSAGE_NOT_FOUND = "Message does not exists";
     private static final String CONVERSATION_NOT_FOUND = "Conversation does not exists";
 
+    private static final Logger logger = LoggerFactory.getLogger(MessageController.class);
+
     @PostMapping()
-    public MessageDto.Built createMessage(@RequestBody MessageDto.Pure pureMessage, HttpServletResponse response) {
+    public MessageDto.Display createMessage(@RequestBody MessageDto.Base baseMessage, HttpServletResponse response, Principal principal) {
         response.setStatus(HttpStatus.CREATED.value());
-        final Message createdMessage = this.messageService.create(pureMessage.toMessage());
+        final Message createdMessage = this.messageService.create(baseMessage.toMessage());
+        logger.info(principal.getName());
         return this.messageService.buildMessage(createdMessage.getId());
     }
 
     @GetMapping(path = "{messageId}")
-    public MessageDto.Pure readMessage(HttpServletResponse response, @PathVariable("messageId") UUID messageId) {
+    public MessageDto.Base readMessage(HttpServletResponse response, @PathVariable("messageId") UUID messageId) {
         try {
             response.setStatus(HttpStatus.FOUND.value());
             return this.messageService.findById(messageId).toPureMessage();
@@ -35,8 +41,8 @@ public record MessageController(MessageService messageService) {
     }
 
     @GetMapping(path = "collection/{recipientId}/{senderId}")
-    public List<MessageDto.Built> getChatHistory(HttpServletResponse response, @PathVariable("recipientId") UUID recipientId,
-                                                 @PathVariable("senderId") UUID senderId) {
+    public List<MessageDto.Display> getChatHistory(HttpServletResponse response, @PathVariable("recipientId") UUID recipientId,
+                                                   @PathVariable("senderId") UUID senderId) {
         try {
             response.setStatus(HttpStatus.FOUND.value());
             return this.messageService.getChatHistory(recipientId, senderId);
@@ -47,7 +53,7 @@ public record MessageController(MessageService messageService) {
     }
 
     @PutMapping(path = "{messageId}")
-    public MessageDto.Pure updateMessage(HttpServletResponse response, @RequestBody MessageDto.Update updateMessage,
+    public MessageDto.Base updateMessage(HttpServletResponse response, @RequestBody MessageDto.Update updateMessage,
                                          @PathVariable("messageId") UUID messageId){
         try {
             response.setStatus(HttpStatus.OK.value());

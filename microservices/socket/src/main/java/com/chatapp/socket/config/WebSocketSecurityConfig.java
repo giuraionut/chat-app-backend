@@ -1,9 +1,12 @@
 package com.chatapp.socket.config;
 
+import org.springframework.amqp.core.Queue;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.messaging.simp.user.UserDestinationResolver;
 import org.springframework.security.config.annotation.web.messaging.MessageSecurityMetadataSourceRegistry;
 import org.springframework.security.config.annotation.web.socket.AbstractSecurityWebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -53,7 +56,7 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setApplicationDestinationPrefixes("/app");
-        registry.enableStompBrokerRelay("/topic", "/queue")
+        registry.enableStompBrokerRelay("/topic", "/fanout", "/queue")
                 .setRelayHost(relayHost)
                 .setRelayPort(relayPort)
                 .setVirtualHost(virtualHost)
@@ -62,4 +65,9 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
                 .setSystemLogin(systemLogin)
                 .setSystemPasscode(systemPasscode);
     }
+    @Bean
+    public UserDestinationResolver userDestinationResolver() {
+        return new RememberDestination();
+    }
+
 }

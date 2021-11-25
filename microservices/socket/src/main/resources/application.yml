@@ -11,6 +11,7 @@ keycloak:
 spring:
   main:
     allow-circular-references: true
+    allow-bean-definition-overriding: true
   application:
     name: SOCKET-SERVICE
   security:
@@ -36,4 +37,3 @@ rabbitmq:
   client-passcode: bitnami
   system-login: user
   system-passcode: bitnami
-

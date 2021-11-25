@@ -33,10 +33,10 @@ public class Message {
     private Boolean seen = false;
     private Instant timestamp = Instant.now();
 
-    public MessageDto.Pure toPureMessage() {
+    public MessageDto.Base toPureMessage() {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        return modelMapper.map(this, MessageDto.Pure.class);
+        return modelMapper.map(this, MessageDto.Base.class);
     }
 
     @Override

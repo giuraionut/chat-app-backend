@@ -17,11 +17,11 @@ public class MessageDto {
     }
 
     @Data
-    @EqualsAndHashCode
-    public static class Pure {
+    public static class Base {
         private UUID senderId;
         private UUID recipientId;
         private String content;
+        private Instant timestamp;
 
         public Message toMessage() {
             ModelMapper modelMapper = new ModelMapper();
@@ -31,17 +31,15 @@ public class MessageDto {
     }
 
     @Data
-    @EqualsAndHashCode
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class Built {
+    public static class Display {
         private UUID sender;
         private String content;
         private Instant timestamp;
     }
 
     @Data
-    @EqualsAndHashCode
     public static class Update {
         private String content;
 
@@ -53,7 +51,6 @@ public class MessageDto {
     }
 
     @Data
-    @EqualsAndHashCode
     public static class Identifier{
         private UUID id;
     }

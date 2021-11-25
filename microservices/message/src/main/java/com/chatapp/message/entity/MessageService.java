@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public record MessageService(MessageRepository messageRepository, RestTemplate restTemplate) {
+public record MessageService(MessageRepository messageRepository) {
 
     public Message create(Message message) {
         return this.messageRepository.save(message);
@@ -20,24 +20,24 @@ public record MessageService(MessageRepository messageRepository, RestTemplate r
         return this.messageRepository.findById(messageId).orElseThrow();
     }
 
-    public MessageDto.Built buildMessage(UUID messageId) {
+    public MessageDto.Display buildMessage(UUID messageId) {
         final Message message = this.messageRepository.findById(messageId).orElseThrow();
 
-        return new MessageDto.Built(message.getSenderId(),
+        return new MessageDto.Display(message.getSenderId(),
                 message.getContent(),
                 message.getTimestamp());
 
     }
 
-    public List<MessageDto.Built> getChatHistory(UUID recipientId, UUID senderId) {
+    public List<MessageDto.Display> getChatHistory(UUID recipientId, UUID senderId) {
         final List<Message> chatHistory = findByRecipientAndSender(recipientId, senderId);
 
-        List<MessageDto.Built> historyChatHistory = new ArrayList<>();
+        List<MessageDto.Display> historyChatHistory = new ArrayList<>();
         chatHistory.forEach(message -> {
             if (message.getSenderId().equals(recipientId)) {
-                historyChatHistory.add(new MessageDto.Built(senderId, message.getContent(), message.getTimestamp()));
+                historyChatHistory.add(new MessageDto.Display(senderId, message.getContent(), message.getTimestamp()));
             } else {
-                historyChatHistory.add(new MessageDto.Built(recipientId, message.getContent(), message.getTimestamp()));
+                historyChatHistory.add(new MessageDto.Display(recipientId, message.getContent(), message.getTimestamp()));
             }
         });
         return historyChatHistory;
