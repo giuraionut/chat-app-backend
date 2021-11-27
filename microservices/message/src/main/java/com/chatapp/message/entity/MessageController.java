@@ -16,7 +16,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping(path = "api/v1/message")
 public record MessageController(MessageService messageService) {
-    private static final String MESSAGE_NOT_FOUND = "MessageEntity does not exists";
+    private static final String MESSAGE_NOT_FOUND = "Message does not exists";
     private static final String CONVERSATION_NOT_FOUND = "Conversation does not exists";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageController.class);
