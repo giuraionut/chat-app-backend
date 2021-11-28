@@ -1,10 +1,13 @@
 package com.chatapp.message.entity;
 
 import com.chatapp.message.dto.MessageDto;
+import com.chatapp.message.exceptions.CustomException;
+import com.chatapp.message.exceptions.ExceptionResource;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -14,12 +17,16 @@ public record MessageService(MessageRepository messageRepository) {
         return this.messageRepository.save(messageEntity);
     }
 
-    public MessageEntity findById(UUID messageId) {
-        return this.messageRepository.findById(messageId).orElseThrow();
+    public MessageEntity findById(UUID messageId) throws CustomException {
+        final Optional<MessageEntity> messageOptional = this.messageRepository.findById(messageId);
+        if (messageOptional.isEmpty()) {
+            throw new CustomException(ExceptionResource.MESSAGE_NOT_FOUND);
+        }
+        return messageOptional.get();
     }
 
-    public MessageDto.Display buildMessage(UUID messageId) {
-        final MessageEntity messageEntity = this.messageRepository.findById(messageId).orElseThrow();
+    public MessageDto.Display buildMessage(UUID messageId) throws CustomException {
+        final MessageEntity messageEntity = this.findById(messageId);
 
         return new MessageDto.Display(messageEntity.getSenderId(),
                 messageEntity.getContent(),
@@ -27,9 +34,11 @@ public record MessageService(MessageRepository messageRepository) {
 
     }
 
-    public List<MessageDto.Display> getChatHistory(UUID recipientId, UUID senderId) {
+    public List<MessageDto.Display> getChatHistory(UUID recipientId, UUID senderId) throws CustomException {
         final List<MessageEntity> chatHistory = findByRecipientAndSender(recipientId, senderId);
-
+        if (chatHistory.isEmpty()) {
+            throw new CustomException(ExceptionResource.CHAT_HISTORY_NOT_FOUND);
+        }
         List<MessageDto.Display> historyChatHistory = new ArrayList<>();
         chatHistory.forEach(message -> {
             if (message.getSenderId().equals(recipientId)) {
@@ -42,13 +51,13 @@ public record MessageService(MessageRepository messageRepository) {
     }
 
 
-    public MessageEntity update(UUID id, MessageDto.Update sendReceiveMessageDto) {
+    public MessageEntity update(UUID id, MessageDto.Update sendReceiveMessageDto) throws CustomException {
         final MessageEntity oldMessageEntity = this.findById(id);
         oldMessageEntity.setContent(sendReceiveMessageDto.getContent());
         return this.messageRepository.save(oldMessageEntity);
     }
 
-    public void delete(UUID messageId) {
+    public void delete(UUID messageId) throws CustomException {
         final MessageEntity messageEntity = this.findById(messageId);
         this.messageRepository.delete(messageEntity);
     }
