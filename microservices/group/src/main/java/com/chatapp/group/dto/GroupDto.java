@@ -35,5 +35,11 @@ public class GroupDto {
         private String name;
         private String avatar;
         private List<Category> categories;
+
+        public GroupEntity toEntity(){
+            ModelMapper modelMapper = new ModelMapper();
+            modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+            return modelMapper.map(this, GroupEntity.class);
+        }
     }
 }

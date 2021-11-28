@@ -1,7 +1,6 @@
 package com.chatapp.group.dto;
 
 import com.chatapp.group.components.Room;
-import com.chatapp.group.entity.GroupEntity;
 import lombok.Data;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;

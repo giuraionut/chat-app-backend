@@ -23,4 +23,8 @@ public class CategoryDto {
             return modelMapper.map(this, Category.class);
         }
     }
+    @Data
+    public static class Update{
+        private String name;
+    }
 }

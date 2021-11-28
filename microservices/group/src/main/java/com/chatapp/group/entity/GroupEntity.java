@@ -2,6 +2,8 @@ package com.chatapp.group.entity;
 
 import com.chatapp.group.components.Category;
 import com.chatapp.group.dto.GroupDto;
+import com.chatapp.group.exceptions.CustomException;
+import com.chatapp.group.exceptions.ExceptionResource;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -72,5 +74,11 @@ public class GroupEntity {
 
     public void addUser(UUID userId) {
         this.usersId.add(userId);
+    }
+
+    public void checkPermission(UUID uuid) throws CustomException {
+        if (!ownerId.equals(uuid)) {
+            throw new CustomException(ExceptionResource.ACCESS_DENIED);
+        }
     }
 }
