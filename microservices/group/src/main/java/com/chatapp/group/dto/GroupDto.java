@@ -7,17 +7,16 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 
 import java.util.List;
-import java.util.UUID;
 
 public class GroupDto {
-    private GroupDto(){}
+    private GroupDto() {
+    }
 
     @Data
-    public static class Base{
+    public static class Base {
         private String name;
-        private UUID ownerId;
 
-        public GroupEntity toEntity(){
+        public GroupEntity toEntity() {
             ModelMapper modelMapper = new ModelMapper();
             modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
             return modelMapper.map(this, GroupEntity.class);
@@ -31,15 +30,9 @@ public class GroupDto {
     }
 
     @Data
-    public static class Update{
+    public static class Update {
         private String name;
         private String avatar;
         private List<Category> categories;
-
-        public GroupEntity toEntity(){
-            ModelMapper modelMapper = new ModelMapper();
-            modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-            return modelMapper.map(this, GroupEntity.class);
-        }
     }
 }

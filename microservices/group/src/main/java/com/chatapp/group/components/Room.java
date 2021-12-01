@@ -1,6 +1,5 @@
 package com.chatapp.group.components;
 
-import com.chatapp.group.dto.CategoryDto;
 import com.chatapp.group.dto.RoomDto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

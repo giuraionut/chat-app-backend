@@ -1,6 +1,7 @@
 package com.chatapp.group.entity;
 
 import com.chatapp.group.components.Category;
+import com.chatapp.group.components.Role;
 import com.chatapp.group.dto.GroupDto;
 import com.chatapp.group.exceptions.CustomException;
 import com.chatapp.group.exceptions.ExceptionResource;
@@ -39,7 +40,14 @@ public class GroupEntity {
     @ToString.Exclude
     private List<Category> categories = new ArrayList<>();
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "group_id")
+    @ToString.Exclude
+    private List<Role> roles = new ArrayList<>();
+
     @ElementCollection
+    @Column(name = "user_id", nullable = false)
+    @CollectionTable(name = "group_users_mapping", joinColumns = @JoinColumn(name = "group_id"))
     @ToString.Exclude
     private List<UUID> usersId = new ArrayList<>();
 
@@ -74,6 +82,10 @@ public class GroupEntity {
 
     public void addUser(UUID userId) {
         this.usersId.add(userId);
+    }
+
+    public void addRole(Role role) {
+        this.roles.add(role);
     }
 
     public void checkPermission(UUID uuid) throws CustomException {

@@ -7,14 +7,16 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 
 public class CategoryDto {
-    private CategoryDto(){}
+    private CategoryDto() {
+    }
 
     @Data
-    public static class Display{
+    public static class Display {
         private String name;
     }
+
     @Data
-    public static class Base{
+    public static class Base {
         private String name;
 
         public Category toEntity() {
@@ -23,8 +25,9 @@ public class CategoryDto {
             return modelMapper.map(this, Category.class);
         }
     }
+
     @Data
-    public static class Update{
+    public static class Update {
         private String name;
     }
 }

@@ -1,16 +1,16 @@
 package com.chatapp.group.entity;
 
 import com.chatapp.group.components.Category;
+import com.chatapp.group.components.Role;
 import com.chatapp.group.components.Room;
-import com.chatapp.group.dto.CategoryDto;
-import com.chatapp.group.dto.GroupDto;
-import com.chatapp.group.dto.RoomDto;
+import com.chatapp.group.dto.*;
 import com.chatapp.group.exceptions.CustomException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -22,11 +22,10 @@ public record GroupController(GroupService groupService) {
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupController.class);
 
     @PostMapping()
-    public GroupDto.Display createGroup(@RequestBody GroupDto.Base baseGroup) {
+    public GroupDto.Display createGroup(@RequestBody GroupDto.Base baseGroup, Principal principal) {
         final GroupEntity groupEntity = baseGroup.toEntity();
-        return this.groupService.createGroup(groupEntity).toDisplay();
+        return this.groupService.createGroup(groupEntity, principal).toDisplay();
     }
-
 
     @PostMapping(path = "{groupId}/category")
     public CategoryDto.Display createCategory(@RequestBody CategoryDto.Base baseCategory, @PathVariable("groupId") UUID groupId,
@@ -78,6 +77,27 @@ public record GroupController(GroupService groupService) {
                 .stream().filter(category -> category.getId().equals(categoryId))
                 .findFirst().orElseThrow();
         return requestedCategory.getRooms().stream().map(Room::toDisplay).collect(Collectors.toList());
+    }
+
+    @GetMapping(path = "{groupId}/users")
+    public List<UserDto> getUsers(@PathVariable("groupId") UUID groupId) throws CustomException {
+        final GroupEntity groupById = this.groupService.findGroupById(groupId);
+        final List<Role> roles = groupById.getRoles();
+        final List<UUID> usersId = groupById.getUsersId();
+
+        List<UserDto> users = new ArrayList<>();
+
+
+        for (UUID uuid : usersId) {
+            List<RoleDto> userRoles = new ArrayList<>();
+            for (Role role : roles) {
+                if (role.getUsersId().contains(uuid)) {
+                    userRoles.add(role.toRoleDto());
+                }
+            }
+            users.add(new UserDto(uuid, userRoles));
+        }
+        return users;
     }
 
     @PutMapping(path = "{groupId}")

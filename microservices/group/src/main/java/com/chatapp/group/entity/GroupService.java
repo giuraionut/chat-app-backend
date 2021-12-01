@@ -1,27 +1,40 @@
 package com.chatapp.group.entity;
 
 import com.chatapp.group.components.Category;
+import com.chatapp.group.components.Role;
 import com.chatapp.group.components.Room;
 import com.chatapp.group.dto.CategoryDto;
 import com.chatapp.group.dto.GroupDto;
 import com.chatapp.group.exceptions.CustomException;
 import com.chatapp.group.exceptions.ExceptionResource;
+import com.chatapp.group.permissions.Permission;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public record GroupService(GroupRepository groupRepository) {
 
-    public GroupEntity createGroup(GroupEntity groupEntity) {
+    public GroupEntity createGroup(GroupEntity groupEntity, Principal principal) {
+        groupEntity.setOwnerId(UUID.fromString(principal.getName()));
+        Role role = new Role();
+        role.setName("Owner");
+        role.setGroupEntity(groupEntity);
+        role.addPermissions(Permission.MESSAGES_MANAGE);
+        role.addPermissions(Permission.ROOMS_MANAGE);
+        role.addPermissions(Permission.ROOMS_VIEW);
+        role.addUsers(UUID.fromString(principal.getName()));
         Category category = new Category();
         category.setName("text channels");
         Room room = new Room();
         room.setName("general");
         room.setType(1);
         category.addRoom(room);
+        groupEntity.addRole(role);
         groupEntity.addCategory(category);
+        groupEntity.addUser(UUID.fromString(principal.getName()));
         return this.groupRepository.save(groupEntity);
     }
 
@@ -59,5 +72,6 @@ public record GroupService(GroupRepository groupRepository) {
         this.groupRepository.save(groupEntity);
         return category.toDisplay();
     }
+
 
 }
