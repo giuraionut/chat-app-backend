@@ -7,8 +7,9 @@ public enum ExceptionResource {
     CATEGORY_NOT_FOUND("Requested category does not exists", HttpStatus.NOT_FOUND),
     ROOM_NOT_FOUND("Requested room does not exists", HttpStatus.NOT_FOUND),
 
-    ACCESS_DENIED("You don't have enough permissions for this action", HttpStatus.FORBIDDEN);
+    ACCESS_DENIED("You don't have enough permissions for this action", HttpStatus.FORBIDDEN),
 
+    ROLE_NOT_FOUND("Requested role does not exists", HttpStatus.NOT_FOUND);
     private final String message;
     private final HttpStatus httpStatus;
 

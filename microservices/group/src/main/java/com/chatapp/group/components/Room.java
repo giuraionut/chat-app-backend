@@ -24,8 +24,11 @@ public class Room {
     private UUID id;
 
     private String name;
-    private Integer type;
+    private String type;
 
+    public void setType(RoomType type) {
+        this.type = type.name();
+    }
 
     public RoomDto.Display toDisplay() {
         ModelMapper modelMapper = new ModelMapper();

@@ -7,10 +7,23 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 import java.util.UUID;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+
 public class UserDto {
-    private UUID id;
-    private List<RoleDto> roles;
+
+    private UserDto(){}
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Display {
+        private UUID id;
+        private List<RoleDto> roles;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Add {
+        private UUID id;
+    }
 }

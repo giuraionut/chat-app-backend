@@ -33,6 +33,8 @@ public class Role {
 
     private String name;
 
+    private String type;
+
     @ElementCollection
     @Column(name = "user_id", nullable = false)
     @CollectionTable(name = "user_role_mapping")
@@ -47,9 +49,17 @@ public class Role {
     private List<String> permissions = new ArrayList<>();
 
     @ManyToOne(cascade = CascadeType.ALL, optional = false)
-    @JoinColumn(name = "group_id", nullable = false, unique = true)
+    @JoinColumn(name = "group_id", nullable = false)
     @ToString.Exclude
     private GroupEntity groupEntity;
+
+    public boolean isGenerated(){
+        return this.type.equals(RoleType.GENERATED.name());
+    }
+
+    public void setType(RoleType type){
+        this.type = type.name();
+    }
 
     public void addUsers(UUID userId) {
         this.usersId.add(userId);

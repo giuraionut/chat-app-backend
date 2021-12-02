@@ -5,12 +5,15 @@ import lombok.Data;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 
+import java.util.UUID;
+
 public class RoomDto {
     private RoomDto() {
     }
 
     @Data
     public static class Display {
+        private UUID id;
         private String name;
     }
 

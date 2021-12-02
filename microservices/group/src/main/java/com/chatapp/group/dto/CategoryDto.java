@@ -6,12 +6,15 @@ import lombok.Data;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 
+import java.util.UUID;
+
 public class CategoryDto {
     private CategoryDto() {
     }
 
     @Data
     public static class Display {
+        private UUID id;
         private String name;
     }
 

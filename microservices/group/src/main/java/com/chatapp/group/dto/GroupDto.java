@@ -7,6 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 
 import java.util.List;
+import java.util.UUID;
 
 public class GroupDto {
     private GroupDto() {
@@ -26,6 +27,7 @@ public class GroupDto {
     @Data
     public static class Display {
         private String name;
+        private UUID ownerId;
         private String avatar;
     }
 
