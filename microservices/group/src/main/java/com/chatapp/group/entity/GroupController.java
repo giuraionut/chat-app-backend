@@ -1,9 +1,6 @@
 package com.chatapp.group.entity;
 
-import com.chatapp.group.components.Category;
-import com.chatapp.group.components.Role;
-import com.chatapp.group.components.Room;
-import com.chatapp.group.components.RoomType;
+import com.chatapp.group.components.*;
 import com.chatapp.group.dto.*;
 import com.chatapp.group.exceptions.CustomException;
 import com.chatapp.group.permissions.AccessManager;
@@ -13,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,8 +27,8 @@ public record GroupController(GroupService groupService) {
     }
 
     @PostMapping(path = "{groupId}/member")
-    public GroupDto.Display addMember(@PathVariable("groupId") UUID groupId, @RequestBody UserDto.Add user) throws CustomException {
-        return this.groupService.addMember(groupId, user.getId()).toDisplay();
+    public GroupDto.Display addMember(@PathVariable("groupId") UUID groupId, @RequestBody MemberDto.Add member) throws CustomException {
+        return this.groupService.addMember(groupId, member.getUserId()).toDisplay();
     }
 
     @PostMapping(path = "{groupId}/category")
@@ -94,27 +90,15 @@ public record GroupController(GroupService groupService) {
     }
 
     @GetMapping(path = "{groupId}/users")
-    public List<UserDto.Display> getUsers(@PathVariable("groupId") UUID groupId, Principal principal) throws CustomException {
+    public List<MemberDto.Display> getUsers(@PathVariable("groupId") UUID groupId, Principal principal) throws CustomException {
 
         final GroupEntity group = this.groupService.findGroupById(groupId);
 
         AccessManager.checkPermission(principal, group, Permission.GROUP_VIEW);
 
-        final List<Role> roles = group.getRoles();
-        final List<UUID> usersId = group.getUsersId();
+        final List<MemberDto.Display> members = group.getMembers().stream().map(Member::toDisplay).toList();
 
-        List<UserDto.Display> users = new ArrayList<>();
-
-        for (UUID uuid : usersId) {
-            List<RoleDto> userRoles = new ArrayList<>();
-            for (Role role : roles) {
-                if (role.getUsersId().contains(uuid)) {
-                    userRoles.add(role.toRoleDto());
-                }
-            }
-            users.add(new UserDto.Display(uuid, userRoles));
-        }
-        return users;
+        return members;
     }
 
     @GetMapping(path = "{groupId}/roles")
@@ -146,5 +130,12 @@ public record GroupController(GroupService groupService) {
         return this.groupService.updateCategory(group, categoryId, newCategory);
 
     }
-//    @DeleteMapping()
+
+    @DeleteMapping(path = "{groupId}")
+    public String deleteGroup(@PathVariable("groupId") UUID groupId, Principal principal) throws CustomException {
+        final GroupEntity group = this.groupService.findGroupById(groupId);
+        AccessManager.checkPermission(principal, group);
+        this.groupService.deleteGroup(group);
+        return group.getName() + " deleted successfully";
+    }
 }

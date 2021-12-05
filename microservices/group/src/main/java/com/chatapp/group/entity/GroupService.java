@@ -1,9 +1,6 @@
 package com.chatapp.group.entity;
 
-import com.chatapp.group.components.Category;
-import com.chatapp.group.components.Role;
-import com.chatapp.group.components.Room;
-import com.chatapp.group.components.RoomType;
+import com.chatapp.group.components.*;
 import com.chatapp.group.dto.CategoryDto;
 import com.chatapp.group.dto.GroupDto;
 import com.chatapp.group.exceptions.CustomException;
@@ -26,42 +23,53 @@ public class GroupService {
         this.groupRepository = groupRepository;
     }
 
+
     @Transactional
     public GroupEntity createGroup(GroupEntity group, Principal principal) {
         group.setOwnerId(UUID.fromString(principal.getName()));
+
+        Member member = new Member();
+        member.setUserId(UUID.fromString(principal.getName()));
+
         Role role = new Role();
         role.setName("OWNER");
         role.addPermissions(Permission.MESSAGES_MANAGE);
         role.addPermissions(Permission.ROOMS_MANAGE);
         role.addPermissions(Permission.ROOMS_VIEW);
-        role.addUsers(UUID.fromString(principal.getName()));
+        member.addRole(role);
+
         Category category = new Category();
         category.setName("text channels");
+
         Room room = new Room();
+        room.setCategory(category);
         room.setName("general");
         room.setType(RoomType.PUBLIC);
         category.addRoom(room);
+
         group.generateRole(role);
         group.addCategory(category);
-        group.addUser(UUID.fromString(principal.getName()));
+        group.addMember(member);
         return this.groupRepository.save(group);
     }
 
     @Transactional
     public GroupEntity addMember(UUID groupId, UUID userId) throws CustomException {
         final GroupEntity group = this.findGroupById(groupId);
+        Member member = new Member();
+        member.setUserId(userId);
         try {
             group.getGeneratedRoles().stream().filter(role -> role.getName().equals("MEMBER")).findFirst()
-                    .ifPresent(r -> r.addUsers(userId));
+                    .ifPresent(member::addRole);
         } catch (NullPointerException ex) {
             Role role = new Role();
             role.setName("MEMBER");
             role.addPermissions(Permission.GROUP_VIEW);
             role.addPermissions(Permission.ROOMS_VIEW);
-            role.addUsers(userId);
             group.generateRole(role);
+            member.addRole(role);
         }
-        group.addUser(userId);
+        group.addMember(member);
         return this.groupRepository.save(group);
     }
 
@@ -70,6 +78,7 @@ public class GroupService {
                 .orElseThrow(() -> new CustomException(ExceptionResource.GROUP_NOT_FOUND));
     }
 
+    @Transactional
     public GroupEntity updateGroup(UUID id, GroupDto.Update newGroup) throws CustomException {
         final GroupEntity oldGroupEntity = this.findGroupById(id);
         oldGroupEntity.setName(newGroup.getName());
@@ -77,11 +86,13 @@ public class GroupService {
         return this.groupRepository.save(oldGroupEntity);
     }
 
-    public void deleteGroup(UUID groupId) throws CustomException {
-        final GroupEntity groupEntity = this.findGroupById(groupId);
+    @Transactional
+    public void deleteGroup(GroupEntity group) throws CustomException {
+        final GroupEntity groupEntity = this.findGroupById(group.getId());
         this.groupRepository.delete(groupEntity);
     }
 
+    @Transactional
     public CategoryDto.Display updateCategory(GroupEntity groupEntity, UUID categoryId, CategoryDto.Update newCategory) throws CustomException {
         final Category category = groupEntity.getCategories().stream().filter(c -> c.getId().equals(categoryId))
                 .findFirst().orElseThrow(() -> new CustomException(ExceptionResource.CATEGORY_NOT_FOUND));

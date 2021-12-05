@@ -26,6 +26,10 @@ public class Room {
     private String name;
     private String type;
 
+    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
+
     public void setType(RoomType type) {
         this.type = type.name();
     }

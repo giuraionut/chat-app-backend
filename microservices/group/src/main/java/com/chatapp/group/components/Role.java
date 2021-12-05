@@ -36,12 +36,6 @@ public class Role {
     private String type;
 
     @ElementCollection
-    @Column(name = "user_id", nullable = false)
-    @CollectionTable(name = "user_role_mapping")
-    @ToString.Exclude
-    private List<UUID> usersId = new ArrayList<>();
-
-    @ElementCollection
     @Column(name = "permission", nullable = false)
     @CollectionTable(name = "role_permission_mapping", uniqueConstraints = {
             @UniqueConstraint(columnNames = {"permission", "role_id"})
@@ -53,16 +47,27 @@ public class Role {
     @ToString.Exclude
     private GroupEntity groupEntity;
 
-    public boolean isGenerated(){
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "roles_members_mapping",
+            joinColumns = @JoinColumn(name = "role_id"),
+            inverseJoinColumns = @JoinColumn(name = "members_id"))
+    @ToString.Exclude
+    private List<Member> members = new ArrayList<>();
+
+    public boolean isGenerated() {
         return this.type.equals(RoleType.GENERATED.name());
     }
 
-    public void setType(RoleType type){
+    public void setType(RoleType type) {
         this.type = type.name();
     }
 
-    public void addUsers(UUID userId) {
-        this.usersId.add(userId);
+    public void addMember(Member member) {
+        this.members.add(member);
+    }
+
+    public void deleteMember(Member member) {
+        this.members.remove(member);
     }
 
     public void addPermissions(Permission permission) {

@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.UUID;
 
 
-public class UserDto {
+public class MemberDto {
 
-    private UserDto(){}
+    private MemberDto(){}
 
     @Data
     @AllArgsConstructor
@@ -24,6 +24,6 @@ public class UserDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Add {
-        private UUID id;
+        private UUID userId;
     }
 }

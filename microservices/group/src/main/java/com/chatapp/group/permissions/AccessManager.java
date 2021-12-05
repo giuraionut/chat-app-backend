@@ -1,6 +1,6 @@
 package com.chatapp.group.permissions;
 
-import com.chatapp.group.components.Role;
+import com.chatapp.group.components.Member;
 import com.chatapp.group.entity.GroupController;
 import com.chatapp.group.entity.GroupEntity;
 import com.chatapp.group.exceptions.CustomException;
@@ -24,9 +24,15 @@ public class AccessManager {
             return;
         }
 
-        final Role role = group.getRoles().stream().filter(r -> r.getUsersId().contains(UUID.fromString(principal.getName()))).findFirst()
+        final Member member = group.getMembers().stream().filter(m -> m.getUserId().equals(UUID.fromString(principal.getName()))).findFirst()
                 .orElseThrow(() -> new CustomException(ExceptionResource.ACCESS_DENIED));
-        role.getPermissions()
-                .stream().filter(p -> Permission.valueOf(p).equals(permission[0])).findFirst().orElseThrow(() -> new CustomException(ExceptionResource.ACCESS_DENIED));
+
+        member.getRoles().stream().filter(role -> role.getPermissions().contains(permission[0].name())).findFirst()
+                .orElseThrow(() -> new CustomException(ExceptionResource.ACCESS_DENIED));
+
+//        final Role role = group.getRoles().stream().filter(r -> r.getMembers().contains(UUID.fromString(principal.getName()))).findFirst()
+//                .orElseThrow(() -> new CustomException(ExceptionResource.ACCESS_DENIED));
+//        role.getPermissions()
+//                .stream().filter(p -> Perms.valueOf(p).equals(permission[0])).findFirst().orElseThrow(() -> new CustomException(ExceptionResource.ACCESS_DENIED));
     }
 }
