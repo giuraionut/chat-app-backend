@@ -3,6 +3,7 @@ package com.chatapp.group.entity;
 import com.chatapp.group.components.*;
 import com.chatapp.group.dto.CategoryDto;
 import com.chatapp.group.dto.GroupDto;
+import com.chatapp.group.dto.RoomDto;
 import com.chatapp.group.exceptions.CustomException;
 import com.chatapp.group.exceptions.ExceptionResource;
 import com.chatapp.group.permissions.Permission;
@@ -83,6 +84,8 @@ public class GroupService {
         final GroupEntity oldGroupEntity = this.findGroupById(id);
         oldGroupEntity.setName(newGroup.getName());
         oldGroupEntity.setAvatar(newGroup.getAvatar());
+        if (newGroup.getCategory() != null)
+            oldGroupEntity.addCategory(newGroup.getCategory());
         return this.groupRepository.save(oldGroupEntity);
     }
 
@@ -102,5 +105,16 @@ public class GroupService {
         return category.toDisplay();
     }
 
-
+    @Transactional
+    public RoomDto.Display updateRoom(GroupEntity group, UUID categoryId, UUID roomId, RoomDto.Update updatedRoom) throws CustomException {
+        final Category category = group.getCategoryById(categoryId);
+        final Room room = category.getRoomById(roomId);
+        room.setName(updatedRoom.getName());
+        if (updatedRoom.getCategoryId() != null) {
+            final Category newCategory = group.getCategoryById(updatedRoom.getCategoryId());
+            newCategory.addRoom(room);
+        }
+        this.groupRepository.save(group);
+        return room.toDisplay();
+    }
 }

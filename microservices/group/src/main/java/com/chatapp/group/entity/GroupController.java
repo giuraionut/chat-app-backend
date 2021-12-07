@@ -37,10 +37,10 @@ public record GroupController(GroupService groupService) {
         final GroupEntity group = this.groupService.findGroupById(groupId);
 
         AccessManager.checkPermission(principal, group, Permission.ROOMS_MANAGE);
-
         final Category category = baseCategory.toEntity();
-        group.addCategory(category);
-        this.groupService.updateGroup(groupId, group.toUpdate());
+        final GroupDto.Update updatedGroup = group.toUpdate();
+        updatedGroup.setCategory(category);
+        this.groupService.updateGroup(groupId, updatedGroup);
         return category.toDisplay();
     }
 
@@ -96,9 +96,7 @@ public record GroupController(GroupService groupService) {
 
         AccessManager.checkPermission(principal, group, Permission.GROUP_VIEW);
 
-        final List<MemberDto.Display> members = group.getMembers().stream().map(Member::toDisplay).toList();
-
-        return members;
+        return group.getMembers().stream().map(Member::toDisplay).toList();
     }
 
     @GetMapping(path = "{groupId}/roles")
@@ -112,22 +110,34 @@ public record GroupController(GroupService groupService) {
     }
 
     @PutMapping(path = "{groupId}")
-    public GroupDto.Display updateGroup(@PathVariable("groupId") UUID groupId, @RequestBody GroupDto.Update newGroup, Principal principal) throws CustomException {
+    public GroupDto.Display updateGroup(@PathVariable("groupId") UUID groupId, @RequestBody GroupDto.Update updatedGroup, Principal principal) throws CustomException {
         final GroupEntity oldGroup = this.groupService.findGroupById(groupId);
 
         AccessManager.checkPermission(principal, oldGroup, Permission.GROUP_MANAGE);
 
-        return this.groupService.updateGroup(groupId, newGroup).toDisplay();
+        return this.groupService.updateGroup(groupId, updatedGroup).toDisplay();
     }
 
     @PutMapping(path = "{groupId}/category/{categoryId}")
     public CategoryDto.Display updateCategory(@PathVariable("groupId") UUID groupId, @PathVariable("categoryId") UUID categoryId,
-                                              @RequestBody CategoryDto.Update newCategory, Principal principal) throws CustomException {
+                                              @RequestBody CategoryDto.Update updatedCategory, Principal principal) throws CustomException {
         final GroupEntity group = this.groupService.findGroupById(groupId);
 
         AccessManager.checkPermission(principal, group, Permission.ROOMS_MANAGE);
 
-        return this.groupService.updateCategory(group, categoryId, newCategory);
+        return this.groupService.updateCategory(group, categoryId, updatedCategory);
+
+    }
+
+    @PutMapping(path = "{groupId}/category/{categoryId}/room/{roomId}")
+    public RoomDto.Display updateRoom(@PathVariable("groupId") UUID groupId, @PathVariable("categoryId") UUID categoryId,
+                                      @PathVariable("roomId") UUID roomId,
+                                      @RequestBody RoomDto.Update updatedRoom, Principal principal) throws CustomException {
+        final GroupEntity group = this.groupService.findGroupById(groupId);
+
+        AccessManager.checkPermission(principal, group, Permission.ROOMS_MANAGE);
+
+        return this.groupService.updateRoom(group, categoryId, roomId, updatedRoom);
 
     }
 

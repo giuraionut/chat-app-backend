@@ -27,5 +27,18 @@ public class RoomDto {
             return modelMapper.map(this, Room.class);
         }
     }
+
+    @Data
+    public static class Update {
+        private String name;
+        private UUID categoryId;
+
+        public Room toEntity() {
+            ModelMapper modelMapper = new ModelMapper();
+            modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+            return modelMapper.map(this, Room.class);
+        }
+    }
+
 }
 

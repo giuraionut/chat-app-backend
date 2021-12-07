@@ -5,6 +5,8 @@ import com.chatapp.group.components.Member;
 import com.chatapp.group.components.Role;
 import com.chatapp.group.components.RoleType;
 import com.chatapp.group.dto.GroupDto;
+import com.chatapp.group.exceptions.CustomException;
+import com.chatapp.group.exceptions.ExceptionResource;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -87,6 +89,11 @@ public class GroupEntity {
     public void addCategory(Category category) {
         category.setGroupEntity(this);
         this.categories.add(category);
+    }
+
+    public Category getCategoryById(UUID categoryId) throws CustomException {
+        return this.categories.stream().filter(category -> category.getId().equals(categoryId)).findFirst()
+                .orElseThrow(() -> new CustomException(ExceptionResource.CATEGORY_NOT_FOUND));
     }
 
     public void addMember(Member member) {

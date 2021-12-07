@@ -35,6 +35,6 @@ public class GroupDto {
     public static class Update {
         private String name;
         private String avatar;
-        private List<Category> categories;
+        private Category category;
     }
 }
