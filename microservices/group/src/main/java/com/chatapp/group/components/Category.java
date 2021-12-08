@@ -45,10 +45,6 @@ public class Category {
         this.rooms.add(room);
     }
 
-    public void deleteRoom(Room room) {
-        this.rooms.remove(room);
-    }
-
     public CategoryDto.Display toDisplay() {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);

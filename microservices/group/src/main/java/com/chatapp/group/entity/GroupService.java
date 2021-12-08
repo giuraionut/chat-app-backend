@@ -3,6 +3,7 @@ package com.chatapp.group.entity;
 import com.chatapp.group.components.*;
 import com.chatapp.group.dto.CategoryDto;
 import com.chatapp.group.dto.GroupDto;
+import com.chatapp.group.dto.MessageDto;
 import com.chatapp.group.dto.RoomDto;
 import com.chatapp.group.exceptions.CustomException;
 import com.chatapp.group.exceptions.ExceptionResource;
@@ -116,5 +117,17 @@ public class GroupService {
         }
         this.groupRepository.save(group);
         return room.toDisplay();
+    }
+
+    @Transactional
+    public MessageDto.Display addMessageInRoom(GroupEntity group, UUID categoryId, UUID roomId, MessageDto.Base messageBase) throws CustomException {
+        final Category category = group.getCategoryById(categoryId);
+        final Room room = category.getRoomById(roomId);
+        Message message = new Message();
+        System.out.println(messageBase);
+        message.setMessageId(messageBase.getMessageId());
+        room.addMessage(message);
+        this.groupRepository.save(group);
+        return message.toDisplay();
     }
 }

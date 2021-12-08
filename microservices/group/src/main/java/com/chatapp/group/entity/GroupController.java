@@ -126,7 +126,6 @@ public record GroupController(GroupService groupService) {
         AccessManager.checkPermission(principal, group, Permission.ROOMS_MANAGE);
 
         return this.groupService.updateCategory(group, categoryId, updatedCategory);
-
     }
 
     @PutMapping(path = "{groupId}/category/{categoryId}/room/{roomId}")
@@ -138,7 +137,6 @@ public record GroupController(GroupService groupService) {
         AccessManager.checkPermission(principal, group, Permission.ROOMS_MANAGE);
 
         return this.groupService.updateRoom(group, categoryId, roomId, updatedRoom);
-
     }
 
     @DeleteMapping(path = "{groupId}")
@@ -148,4 +146,14 @@ public record GroupController(GroupService groupService) {
         this.groupService.deleteGroup(group);
         return group.getName() + " deleted successfully";
     }
+
+    @PatchMapping(path = "{groupId}/category/{categoryId}/room/{roomId}/message")
+    public MessageDto.Display persistMessage(@PathVariable("groupId") UUID groupId, @PathVariable("categoryId") UUID categoryId,
+                                             @PathVariable("roomId") UUID roomId, Principal principal, @RequestBody MessageDto.Base message) throws CustomException {
+        final GroupEntity group = this.groupService.findGroupById(groupId);
+        AccessManager.checkPermission(principal, group, Permission.GROUP_VIEW);
+        return this.groupService.addMessageInRoom(group, categoryId, roomId, message);
+
+    }
+
 }
