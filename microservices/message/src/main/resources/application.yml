@@ -26,7 +26,7 @@ spring:
   application:
     name: MESSAGE-SERVICE
   datasource:
-    url: jdbc:postgresql://localhost:5432/group
+    url: jdbc:postgresql://localhost:5432/message
     username: keycloak
     password: password
     driver-class-name: org.postgresql.Driver

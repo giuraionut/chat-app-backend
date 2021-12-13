@@ -152,8 +152,9 @@ public record GroupController(GroupService groupService) {
                                              @PathVariable("roomId") UUID roomId, Principal principal, @RequestBody MessageDto.Base message) throws CustomException {
         final GroupEntity group = this.groupService.findGroupById(groupId);
         AccessManager.checkPermission(principal, group, Permission.GROUP_VIEW);
-        return this.groupService.addMessageInRoom(group, categoryId, roomId, message);
-
+        final MessageDto.Display display = this.groupService.addMessageInRoom(group, categoryId, roomId, message);
+        System.out.println(display);
+        return display;
     }
 
 }

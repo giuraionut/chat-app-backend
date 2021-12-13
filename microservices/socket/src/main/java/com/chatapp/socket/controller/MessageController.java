@@ -1,6 +1,7 @@
 package com.chatapp.socket.controller;
 
 import com.chatapp.socket.message_dto.Message;
+import com.chatapp.socket.utils.Route;
 import org.keycloak.adapters.springsecurity.client.KeycloakRestTemplate;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.slf4j.Logger;
@@ -35,9 +36,18 @@ public class MessageController {
         message.setSenderUsername(token.getAccount().getKeycloakSecurityContext().getToken().getPreferredUsername());
         message.setTimestamp(Instant.now());
 
-        LOGGER.info("PUBLIC MESSAGE: {}", message);
+        LOGGER.info("CONTENT: {}", message.getContent());
+        LOGGER.info("DESTINATION: {}", message.getDestination());
 
-        messagingTemplate.convertAndSend("/topic/" + message.getRecipientId(), message.toDisplay());
+        messagingTemplate.convertAndSend("/topic/" + message.getDestination(), message.toDisplay());
+        final Message.fromMessageService messageFromMessageService =
+                keycloakRestTemplate.postForObject(Route.MESSAGE.CREATE, message.toPersist(), Message.fromMessageService.class);
+
+        System.out.println(messageFromMessageService);
+        final Message.fromGroupService fromGroupService =
+                keycloakRestTemplate.patchForObject(Route.GROUP.CREATE + message.getDestination(), messageFromMessageService, Message.fromGroupService.class);
+        System.out.println(fromGroupService);
+
     }
 
     @MessageMapping("/chat.sendPrivateMessage")
@@ -48,7 +58,7 @@ public class MessageController {
 
         LOGGER.info("PRIVATE MESSAGE: {}", message);
 
-        messagingTemplate.convertAndSend("/user/" + message.getRecipientId() + "/queue/private", message); // destination
+        messagingTemplate.convertAndSend("/user/" + message.getDestination() + "/queue/private", message); // destination
         messagingTemplate.convertAndSend("/user/" + token.getAccount().getPrincipal().getName() + "/queue/private", message); // self
 //      keycloakRestTemplate.postForLocation(Route.MESSAGE.CREATE, message.toPersist());
     }

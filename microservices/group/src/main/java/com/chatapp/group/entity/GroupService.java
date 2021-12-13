@@ -124,7 +124,6 @@ public class GroupService {
         final Category category = group.getCategoryById(categoryId);
         final Room room = category.getRoomById(roomId);
         Message message = new Message();
-        System.out.println(messageBase);
         message.setMessageId(messageBase.getMessageId());
         room.addMessage(message);
         this.groupRepository.save(group);

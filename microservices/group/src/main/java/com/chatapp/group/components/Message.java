@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Entity
-@Table(name = "messages")
+@Table(name = "messages_rooms_mapping")
 @Getter
 @Setter
 @ToString
@@ -34,7 +34,9 @@ public class Message {
     public MessageDto.Display toDisplay() {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        return modelMapper.map(this, MessageDto.Display.class);
+        final MessageDto.Display map = modelMapper.map(this, MessageDto.Display.class);
+        map.setRoomId(room.getId());
+        return map;
     }
 
 

@@ -14,15 +14,15 @@ public class Message {
     @Data
     public static class Base {
         private UUID senderId;
-        private UUID recipientId;
+        private String destination;
 
         private String senderUsername;
         private String content;
         private Instant timestamp;
 
-        public Display toDisplay() {
+        public fromMessageService toDisplay() {
             ModelMapper modelMapper = new ModelMapper();
-            return modelMapper.map(this, Display.class);
+            return modelMapper.map(this, fromMessageService.class);
         }
 
         public Persist toPersist() {
@@ -32,16 +32,21 @@ public class Message {
     }
 
     @Data
-    public static class Display{
-        private String senderUsername;
+    public static class fromMessageService {
+        private UUID messageId;
+        private UUID senderId;
         private String content;
         private Instant timestamp;
     }
     @Data
+    public static class fromGroupService {
+        private UUID messageId;
+        private UUID roomId;
+    }
+
+    @Data
     public static class Persist{
         private UUID senderId;
-        private UUID recipientId;
-
         private String content;
         private Instant timestamp;
     }

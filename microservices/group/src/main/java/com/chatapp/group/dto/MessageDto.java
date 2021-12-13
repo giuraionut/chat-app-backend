@@ -16,6 +16,6 @@ public class MessageDto {
     @Data
     public static class Display {
         private UUID messageId;
-        private String content;
+        private UUID roomId;
     }
 }

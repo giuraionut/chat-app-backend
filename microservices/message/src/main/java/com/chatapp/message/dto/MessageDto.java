@@ -18,7 +18,6 @@ public class MessageDto {
     @Data
     public static class Base {
         private UUID senderId;
-        private UUID recipientId;
         private String content;
         private Instant timestamp;
 
@@ -33,7 +32,8 @@ public class MessageDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Display {
-        private UUID sender;
+        private UUID messageId;
+        private UUID senderId;
         private String content;
         private Instant timestamp;
     }
